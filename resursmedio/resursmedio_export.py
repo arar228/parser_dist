@@ -29,7 +29,7 @@ from core.telegram_notify import send_telegram_message
 
 # --- НАСТРОЙКИ ---
 URL = "https://api.resurs-media.ru/resursmedia/ws/WSAPI"
-CREDENTIALS = ("ARMK", "pD7qPg")
+CREDENTIALS = ("YOUR_RESURSMEDIO_LOGIN", "YOUR_RESURSMEDIO_PASSWORD")
 MAX_THREADS = 12
 MIN_BATCH_SIZE = 50
 MAX_BATCH_SIZE = 500

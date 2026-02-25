@@ -1,6 +1,9 @@
 <div align="center">
   <h1>🚀 B2B API Aggregator & Parser</h1>
-  <p><strong>Мощная, асинхронная система агрегации прайс-листов и остатков ведущих IT-дистрибьюторов</strong></p>
+  <p><strong>A powerful, asynchronous aggregation system for price lists and stock levels from leading IT distributors</strong></p>
+  <p>
+    <a href="#-english">🇺🇸 English</a> | <a href="#-русский">🇷🇺 Русский</a>
+  </p>
   <img src="https://img.shields.io/badge/Python-3.10+-blue.svg" alt="Python">
   <img src="https://img.shields.io/badge/FastAPI-0.100+-green.svg" alt="FastAPI">
   <img src="https://img.shields.io/badge/MySQL-8.0-blue.svg" alt="MySQL">
@@ -9,6 +12,80 @@
 </div>
 
 <br>
+
+<h2 id="-english">🇺🇸 English</h2>
+
+## 🌟 About the Project
+
+One of the main challenges in IT and e-commerce is maintaining up-to-date pricing and stock data from dozens of suppliers, each with their own unique APIs and data formats. 
+**B2B API Aggregator** solves this problem by combining leading IT distributors into a single, consistent, and ultra-fast database with its own REST API.
+
+The system automatically collects hundreds of thousands of items, normalizes part numbers, converts currencies according to current exchange rates, and delivers lightning-fast data to your clients or online store.
+
+## 🔥 Key Features
+
+- 🔌 **Out-of-the-Box Integrations**:
+  - `Merlion` (SOAP/REST API)
+  - `Treolan` (B2B API)
+  - `OCS Distribution` (REST API)
+  - `Marvel` (REST API)
+  - `VVP Group` (REST API)
+  - `Netlab` (SOAP API)
+  - `Resursmedio` (SOAP/REST)
+- ⚡ **High Performance**: Built with `asyncio`, `AIOHTTP`, and optimized SQL queries (`ON DUPLICATE KEY UPDATE`) for instant processing of massive catalogs.
+- 🗄️ **Smart Data Storage**: Robust MySQL relational structure with well-designed indexes for instantaneous lookups by SKU, brand, and part number.
+- 💵 **Multi-Currency Support**: Automatic extraction and conversion of prices (RUB, USD, EUR) with support for custom exchange rates.
+- 🤖 **Telegram Notifications**: Built-in monitoring system — get direct alerts in Telegram for successful data syncs, new products, and potential system errors.
+- 🐳 **Easy Deployment**: Ready-to-use bash scripts (`deploy.sh`, `update_server.sh`) for automated deployment on Linux servers (Ubuntu, AlmaLinux).
+
+## 🛠️ Architecture
+
+The project is built on a modern tech stack ensuring 24/7 reliability:
+* **Backend:** Python + FastAPI (high-performance async framework)
+* **Database:** MySQL (via SQLAlchemy with the async `aiomysql` driver)
+* **Tasks & Scheduler:** Built-in task scheduling system for background synchronization of supplier data without blocking the main API.
+
+## 🚀 Quick Start
+
+### Requirements
+- Python 3.10+
+- MySQL 8.0+
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/your_username/your_repository.git
+cd b2b-api-aggregator
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Configure the application:
+Rename `.env.example` (if available) or create an `.env` file in the root directory to set your credentials (templates are available in configuration files). Ensure your Database details and API keys are set.
+
+4. Run the server:
+```bash
+python main.py
+```
+The API will be available at `http://localhost:8080` (by default). The auto-generated Swagger UI documentation will be available at: `http://localhost:8080/docs`.
+
+## 🔒 Security & Privacy
+
+The entire codebase is designed with security best practices in mind:
+- Authorization mechanisms and session management.
+- Complete isolation of credentials from the codebase.
+- Memory-safe streaming when processing giant XML/JSON responses from suppliers to prevent crashes.
+
+---
+
+<br>
+<br>
+
+<h2 id="-русский">🇷🇺 Русский</h2>
 
 ## 🌟 О проекте
 

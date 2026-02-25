@@ -1,0 +1,557 @@
+Option Explicit
+
+' --- Глобальные константы MERLION ---
+Private Const MERLION_SHEET_NAME As String = "pro"  ' <<--- УБЕДИТЕСЬ, ЧТО ИМЯ ПРАВИЛЬНОЕ!
+Private Const MERLION_INPUT_ARTICUL_COL As String = "P"
+
+' --- УПРАВЛЕНИЕ СТРОКАМИ ---
+Private Const MERLION_HEADERS_ROW As Long = 3
+Private Const MERLION_DATA_START_ROW As Long = 4
+
+
+Private Const MERLION_COL_API_ARTICUL As String = "AH"
+Private Const MERLION_COL_API_NAME As String = "AI"
+Private Const MERLION_COL_API_STOCK As String = "AJ"
+Private Const MERLION_COL_API_PRICE_USD As String = "AL"
+Private Const MERLION_COL_API_PRICE_RUB As String = "AM"
+
+Private Const MERLION_ENDPOINT_URL As String = "https://apitest.merlion.com/dl/mlservice2"
+
+Private Const MERLION_LOGIN As String = "YOUR_MERLION_CLIENT_ID|API"
+Private Const MERLION_PASSWORD As String = "YOUR_MERLION_PASSWORD"
+
+' Corrected as per Merlion support
+Private Const MERLION_SHIPMENT_METHOD As String = "С/В"
+
+Private Const SOAPENV_NS_MERLION As String = "xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/'"
+Private Const MER_NS_ALIAS_MERLION As String = "mer"
+Private Const MER_NS_MERLION As String = "xmlns:" & MER_NS_ALIAS_MERLION & "='https://apitest.merlion.com/dl/mlservice2'"
+
+
+Public Function IsArrayInitialized(arr As Variant) As Boolean
+    On Error Resume Next
+    IsArrayInitialized = (LBound(arr) <= UBound(arr))
+    On Error GoTo 0
+End Function
+
+Sub ProcessMerlionDataFromAPI()
+    Dim ws As Worksheet
+    Dim http As Object
+    Dim lastDataRowInputArticuls As Long
+    Dim currentRow As Long
+    Dim i As Long
+    Dim totalProcessedArticuls As Long
+    Dim totalValidArticulsToProcess As Long
+
+    Dim itemApiDetails As Object
+    Dim availApiDetails As Object
+    Dim articulForApi As String
+    Dim originalArticulFromP As String
+
+    On Error GoTo GlobalErrorHandler_Merlion
+    currentRow = 0
+
+    Debug.Print "--- Запуск ProcessMerlionDataFromAPI (Merlion mlservice2) ---"
+    Debug.Print "Используемый URL эндпоинта: " & MERLION_ENDPOINT_URL
+    Debug.Print "Используемый неймспейс Merlion: " & MER_NS_MERLION
+    Debug.Print "Shipment Method: " & MERLION_SHIPMENT_METHOD
+    Debug.Print "Строка для ЗАГОЛОВКОВ Merlion: " & MERLION_HEADERS_ROW
+    Debug.Print "Начальная СТРОКА ДЛЯ ДАННЫХ (чтение из P и запись в AH-AM): " & MERLION_DATA_START_ROW
+
+
+    Application.ScreenUpdating = False
+    Application.Calculation = xlCalculationManual
+    Application.EnableEvents = False
+    Application.StatusBar = "Merlion: Инициализация..."
+
+    Set ws = ThisWorkbook.Sheets(MERLION_SHEET_NAME)
+
+    If MERLION_HEADERS_ROW > 0 And MERLION_HEADERS_ROW < MERLION_DATA_START_ROW Then
+        Debug.Print "Merlion: Установка/перезапись заголовков в строке " & MERLION_HEADERS_ROW
+        ws.Cells(MERLION_HEADERS_ROW, MERLION_COL_API_ARTICUL).Value = "Артикул (исх)"
+        ws.Cells(MERLION_HEADERS_ROW, MERLION_COL_API_NAME).Value = "Наименование (API)"
+        ws.Cells(MERLION_HEADERS_ROW, MERLION_COL_API_STOCK).Value = "Наличие (API)"
+        ws.Cells(MERLION_HEADERS_ROW, "AK").Value = "Артикул Merlion (API)" ' For Merlion's <No>
+        ws.Cells(MERLION_HEADERS_ROW, MERLION_COL_API_PRICE_USD).Value = "Цена USD (API)"
+        ws.Cells(MERLION_HEADERS_ROW, MERLION_COL_API_PRICE_RUB).Value = "Цена RUB (API)"
+        ws.Cells(MERLION_HEADERS_ROW, "AN").Value = ""
+    Else
+        Debug.Print "Merlion: Пропуск установки заголовков (MERLION_HEADERS_ROW (" & MERLION_HEADERS_ROW & ") некорректна или не меньше MERLION_DATA_START_ROW (" & MERLION_DATA_START_ROW & "))"
+    End If
+    
+    lastDataRowInputArticuls = ws.Cells(Rows.Count, MERLION_INPUT_ARTICUL_COL).End(xlUp).Row
+
+    If lastDataRowInputArticuls < MERLION_DATA_START_ROW Then
+        MsgBox "Merlion: Нет артикулов для обработки в столбце " & MERLION_INPUT_ARTICUL_COL & _
+               " (начиная со строки " & MERLION_DATA_START_ROW & ").", vbInformation
+        GoTo CleanUp_Merlion
+    End If
+
+    Dim lastPopulatedRowInOutput As Long
+    lastPopulatedRowInOutput = ws.Cells(Rows.Count, MERLION_COL_API_ARTICUL).End(xlUp).Row
+    
+    Dim rowToClearFrom As Long
+    rowToClearFrom = MERLION_DATA_START_ROW
+    Dim rowToClearTo As Long
+    rowToClearTo = Application.WorksheetFunction.Max(lastDataRowInputArticuls, lastPopulatedRowInOutput)
+    
+    If rowToClearTo < rowToClearFrom Then
+        rowToClearTo = rowToClearFrom - 1
+    End If
+
+    If rowToClearTo >= rowToClearFrom Then
+        Debug.Print "Merlion: Очистка предыдущих данных в столбцах " & MERLION_COL_API_ARTICUL & "-AM" & _
+                    " со строки " & rowToClearFrom & " до " & rowToClearTo
+        ws.Range(MERLION_COL_API_ARTICUL & rowToClearFrom & ":" & MERLION_COL_API_PRICE_RUB & rowToClearTo).ClearContents
+        ws.Range("AK" & rowToClearFrom & ":AK" & rowToClearTo).ClearContents
+    Else
+        Debug.Print "Merlion: Нет старых данных для очистки в диапазоне результатов API (AH-AM, AK начиная с " & MERLION_DATA_START_ROW & ")."
+    End If
+
+    Set itemApiDetails = CreateObject("Scripting.Dictionary")
+    itemApiDetails.CompareMode = vbTextCompare
+    Set availApiDetails = CreateObject("Scripting.Dictionary")
+    availApiDetails.CompareMode = vbTextCompare
+
+    Set http = CreateObject("WinHttp.WinHttpRequest.5.1")
+    
+    totalValidArticulsToProcess = 0
+    For currentRow = MERLION_DATA_START_ROW To lastDataRowInputArticuls
+        originalArticulFromP = Trim(CStr(ws.Cells(currentRow, MERLION_INPUT_ARTICUL_COL).Value))
+        If originalArticulFromP <> "" And Not IsError(ws.Cells(currentRow, MERLION_INPUT_ARTICUL_COL).Value) And InStr(1, UCase(originalArticulFromP), "ERROR ") = 0 Then
+            totalValidArticulsToProcess = totalValidArticulsToProcess + 1
+        End If
+    Next currentRow
+    Debug.Print "Merlion: Всего ВАЛИДНЫХ артикулов для обработки: " & totalValidArticulsToProcess
+    If totalValidArticulsToProcess = 0 Then
+        MsgBox "Merlion: Нет валидных артикулов для обработки (начиная со строки " & MERLION_DATA_START_ROW & ").", vbInformation
+        GoTo CleanUp_Merlion
+    End If
+
+    totalProcessedArticuls = 0
+    For currentRow = MERLION_DATA_START_ROW To lastDataRowInputArticuls
+        originalArticulFromP = Trim(CStr(ws.Cells(currentRow, MERLION_INPUT_ARTICUL_COL).Value))
+        articulForApi = originalArticulFromP
+        
+         If UCase(originalArticulFromP) = "ZL.BAGEE.003" Then
+             articulForApi = "1724795"
+             Debug.Print "Merlion: ЗАМЕНА P/N " & originalArticulFromP & " НА ID " & articulForApi & " ДЛЯ ТЕСТА (строка Excel: " & currentRow & ")"
+         End If
+        
+        If originalArticulFromP <> "" And _
+           Not IsError(ws.Cells(currentRow, MERLION_INPUT_ARTICUL_COL).Value) And _
+           InStr(1, UCase(originalArticulFromP), "ERROR ") = 0 Then
+
+            Debug.Print "Merlion: Обработка P/N: " & originalArticulFromP & ", API запрос с: " & articulForApi & " (строка Excel: " & currentRow & ")"
+
+            Application.StatusBar = "Merlion: getItems для " & articulForApi & " (" & (totalProcessedArticuls + 1) & "/" & totalValidArticulsToProcess & ")"
+            Call Merlion_GetItem_API(articulForApi, itemApiDetails, http)
+            DoEvents
+
+            Application.StatusBar = "Merlion: getItemsAvail для " & articulForApi & " (" & (totalProcessedArticuls + 1) & "/" & totalValidArticulsToProcess & ")"
+            Call Merlion_GetItemAvail_API(articulForApi, availApiDetails, http)
+            DoEvents
+            
+            ws.Cells(currentRow, MERLION_COL_API_ARTICUL).Value = originalArticulFromP
+
+            Dim itemName As String, itemStock As Variant, itemPriceUSD As Variant, itemPriceRUB As Variant
+            Dim merlionItemNo As String
+            Dim tempDictItem As Object, tempDictAvail As Object
+
+            merlionItemNo = "N/A"
+            itemName = "Товар не найден (API getItems)" ' Default message
+            itemStock = vbNullString
+            itemPriceUSD = vbNullString
+            itemPriceRUB = vbNullString
+
+            Debug.Print "Строка Excel: " & currentRow & ", Поиск в словарях по ключу API: '" & articulForApi & "'"
+
+            If itemApiDetails.Exists(articulForApi) Then
+                Set tempDictItem = itemApiDetails(articulForApi)
+                If TypeName(tempDictItem) = "Dictionary" Then
+                    If tempDictItem.Exists("MerlionNo") Then merlionItemNo = tempDictItem("MerlionNo")
+                    If tempDictItem.Exists("Name") Then itemName = tempDictItem("Name") Else itemName = "Имя не найдено в словаре (items)"
+                    Debug.Print "  itemApiDetails: MerlionNo='" & merlionItemNo & "', Name='" & itemName & "'"
+                Else
+                    itemName = "Ошибка данных (item)"
+                    Debug.Print "    Элемент для '" & articulForApi & "' в itemApiDetails НЕ ЯВЛЯЕТСЯ СЛОВАРЕМ. Тип: " & TypeName(tempDictItem)
+                End If
+            Else
+                 Debug.Print "  НЕ найден в itemApiDetails для артикула '" & articulForApi & "'"
+            End If
+
+            If availApiDetails.Exists(articulForApi) Then
+                Set tempDictAvail = availApiDetails(articulForApi)
+                If TypeName(tempDictAvail) = "Dictionary" Then
+                    If merlionItemNo = "N/A" And tempDictAvail.Exists("MerlionNo") Then merlionItemNo = tempDictAvail("MerlionNo") ' Get MerlionNo if not already found
+                    
+                    If tempDictAvail.Exists("Stock") Then itemStock = tempDictAvail("Stock") Else itemStock = vbNullString
+                    
+                    Dim priceUsdVal As Variant, preparedPriceUsdStr As String, numericPriceUSD As Double
+                    If tempDictAvail.Exists("PriceUSD") Then
+                        priceUsdVal = tempDictAvail("PriceUSD")
+                        preparedPriceUsdStr = Replace(CStr(priceUsdVal), ".", Application.DecimalSeparator)
+                        If IsNumeric(preparedPriceUsdStr) Then
+                            numericPriceUSD = CDbl(preparedPriceUsdStr)
+                            If numericPriceUSD > 0 Then itemPriceUSD = numericPriceUSD Else itemPriceUSD = vbNullString
+                        Else: itemPriceUSD = vbNullString
+                        End If
+                    Else: itemPriceUSD = vbNullString
+                    End If
+
+                    Dim priceRubVal As Variant, preparedPriceRubStr As String, numericPriceRUB As Double
+                    If tempDictAvail.Exists("PriceClientRUB") And Trim(CStr(tempDictAvail("PriceClientRUB"))) <> "0" And Trim(CStr(tempDictAvail("PriceClientRUB"))) <> "" Then
+                        priceRubVal = tempDictAvail("PriceClientRUB")
+                    ElseIf tempDictAvail.Exists("RRP") Then
+                        priceRubVal = tempDictAvail("RRP")
+                        Debug.Print "    Используется RRP для RUB цены, т.к. PriceClientRUB=0 или отсутствует."
+                    Else
+                        priceRubVal = "0"
+                    End If
+                    preparedPriceRubStr = Replace(CStr(priceRubVal), ".", Application.DecimalSeparator)
+                    If IsNumeric(preparedPriceRubStr) Then
+                        numericPriceRUB = CDbl(preparedPriceRubStr)
+                        If numericPriceRUB > 0 Then itemPriceRUB = numericPriceRUB Else itemPriceRUB = vbNullString
+                    Else: itemPriceRUB = vbNullString
+                    End If
+                    Debug.Print "  availApiDetails: MerlionNo='" & merlionItemNo & "', Stock='" & itemStock & "', PriceUSD='" & itemPriceUSD & "', PriceRUB='" & itemPriceRUB & "'"
+                Else
+                    itemStock = "Ошибка данных (avail)"
+                    Debug.Print "    Элемент для '" & articulForApi & "' в availApiDetails НЕ ЯВЛЯЕТСЯ СЛОВАРЕМ. Тип: " & TypeName(tempDictAvail)
+                End If
+            Else
+                Debug.Print "  НЕ найден в availApiDetails для артикула '" & articulForApi & "'"
+            End If
+
+            Debug.Print "  Запись в ячейки (строка " & currentRow & "): MerlionNo='" & merlionItemNo & "', Name='" & itemName & "', Stock='" & itemStock & "', USD='" & itemPriceUSD & "', RUB='" & itemPriceRUB & "'"
+            ws.Cells(currentRow, "AK").Value = merlionItemNo
+            ws.Cells(currentRow, MERLION_COL_API_NAME).Value = itemName
+            ws.Cells(currentRow, MERLION_COL_API_STOCK).Value = itemStock
+            ws.Cells(currentRow, MERLION_COL_API_PRICE_USD).Value = itemPriceUSD
+            ws.Cells(currentRow, MERLION_COL_API_PRICE_RUB).Value = itemPriceRUB
+            
+            totalProcessedArticuls = totalProcessedArticuls + 1
+        Else
+             If currentRow >= MERLION_DATA_START_ROW Then
+                ws.Range(MERLION_COL_API_ARTICUL & currentRow & ":" & MERLION_COL_API_PRICE_RUB & currentRow).ClearContents
+                ws.Cells(currentRow, "AK").ClearContents
+             End If
+        End If
+         If currentRow Mod 20 = 0 Then Application.StatusBar = "Merlion: Обработано " & totalProcessedArticuls & "/" & totalValidArticulsToProcess
+    Next currentRow
+
+    MsgBox "Merlion: Обработка данных завершена! Обработано ВАЛИДНЫХ артикулов: " & totalProcessedArticuls, vbInformation
+    Debug.Print "--- ProcessMerlionDataFromAPI (Merlion mlservice2) ЗАВЕРШЕН ---"
+
+CleanUp_Merlion:
+    Application.StatusBar = False
+    Application.ScreenUpdating = True
+    Application.Calculation = xlCalculationAutomatic
+    Application.EnableEvents = True
+    Set ws = Nothing
+    If Not http Is Nothing Then Set http = Nothing
+    Set itemApiDetails = Nothing
+    Set availApiDetails = Nothing
+    Exit Sub
+
+GlobalErrorHandler_Merlion:
+    Application.StatusBar = False
+    Dim errNum As Long, errDesc As String, errLineVal As Long
+    errNum = Err.Number: errDesc = Err.Description: errLineVal = Erl
+    Dim errorRowInfo As String
+    If currentRow > 0 Then
+        errorRowInfo = "Обрабатывалась строка Excel (чтение/запись): " & currentRow
+    Else
+        errorRowInfo = "Ошибка до начала обработки строк Excel."
+    End If
+    MsgBox "Произошла ошибка VBA (Merlion): " & errNum & vbCrLf & errDesc & vbCrLf & "На строке VBA (Erl): " & errLineVal & vbCrLf & errorRowInfo, vbCritical
+    Debug.Print "КРИТИЧЕСКАЯ ОШИБКА VBA (Merlion): " & errNum & " - " & errDesc & " на строке " & Erl & " (" & errorRowInfo & ")"
+    Resume CleanUp_Merlion
+End Sub
+
+Private Sub Merlion_GetItem_API(ByVal requestedArticul As String, ByRef itemResultsDict As Object, ByRef httpObject As Object)
+    Dim xmlResponseDoc As Object, soapRequestBody As String, base64Credentials As String
+    Dim currentStep As String, foundItemNode As Object
+    
+    On Error GoTo ErrorHandler_Merlion_GetItem_API_Main
+    currentStep = "Начало Merlion_GetItem_API"
+
+    If Trim(requestedArticul) = "" Then Exit Sub
+    Debug.Print "Merlion_GetItem_API: Артикул для запроса: " & requestedArticul
+
+    If httpObject Is Nothing Then Set httpObject = CreateObject("WinHttp.WinHttpRequest.5.1")
+    Set xmlResponseDoc = CreateObject("MSXML2.DOMDocument.6.0")
+    With xmlResponseDoc
+        .async = False
+        .SetProperty "SelectionLanguage", "XPath"
+        .SetProperty "SelectionNamespaces", "xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:mer='" & Replace(Replace(MER_NS_MERLION, "xmlns:mer='", ""), "'", "") & "'"
+    End With
+    
+    base64Credentials = EncodeBase64_Merlion(MERLION_LOGIN & ":" & MERLION_PASSWORD)
+
+    soapRequestBody = _
+        "<soapenv:Envelope " & SOAPENV_NS_MERLION & " " & MER_NS_MERLION & ">" & _
+        "   <soapenv:Header/>" & _
+        "   <soapenv:Body>" & _
+        "      <mer:getItems>" & _
+        "         <mer:login>" & EncodeXMLText_Merlion(MERLION_LOGIN) & "</mer:login>" & _
+        "         <mer:password>" & EncodeXMLText_Merlion(MERLION_PASSWORD) & "</mer:password>" & _
+        "         <mer:item_id>" & EncodeXMLText_Merlion(requestedArticul) & "</mer:item_id>" & _
+        "      </mer:getItems>" & _
+        "   </soapenv:Body>" & _
+        "</soapenv:Envelope>"
+    Debug.Print "Merlion_GetItem_API: Запрос для '" & requestedArticul & "': " & Left(soapRequestBody, 300) & "..."
+
+    Dim tempDict As Object: Set tempDict = CreateObject("Scripting.Dictionary")
+    tempDict("MerlionNo") = "N/A" ' Default
+    tempDict("Name") = "Товар не найден (API getItems)" ' Default
+
+    With httpObject
+        .Open "POST", MERLION_ENDPOINT_URL, False
+        .setRequestHeader "Content-Type", "text/xml;charset=UTF-8"
+        .setRequestHeader "Authorization", "Basic " & base64Credentials
+        .send soapRequestBody
+        Debug.Print "Merlion_GetItem_API: Статус ответа для '" & requestedArticul & "': " & .Status
+
+        If .Status = 200 Then
+            Dim responseTextVal As String: responseTextVal = .responseText
+            If xmlResponseDoc.LoadXML(responseTextVal) Then
+                Dim itemNode As Object, nodesList As Object, childDetailNode As Object
+                Dim xPathQuery As String
+                ' Using local-name() for namespace independence in XPath
+                xPathQuery = "//*[local-name()='Envelope']/*[local-name()='Body']/*[local-name()='getItemsResponse']/*[local-name()='getItemsResult']/*[local-name()='item']"
+                Set nodesList = xmlResponseDoc.SelectNodes(xPathQuery)
+                Set foundItemNode = Nothing ' Reset before loop
+
+                If Not nodesList Is Nothing And nodesList.Length > 0 Then
+                    For Each itemNode In nodesList
+                        Dim noNode As Object
+                        Set noNode = itemNode.SelectSingleNode("*[local-name()='No']")
+                        ' Check if the <No> tag content matches the requestedArticul OR if the original request was a P/N and now we got a Merlion ID back
+                        ' This logic might need refinement depending on how Merlion API behaves for P/N vs Merlion ID in item_id field
+                        If Not noNode Is Nothing Then
+                            If Trim(noNode.Text) = Trim(requestedArticul) Or nodesList.Length = 1 Then ' If only one item returned, assume it's the one.
+                                Set foundItemNode = itemNode
+                                Exit For
+                            End If
+                        End If
+                    Next itemNode
+                End If
+                                
+                If Not foundItemNode Is Nothing Then
+                    Dim merlionNoVal As String, nameVal As String
+                    merlionNoVal = "N/A": nameVal = "Имя не найдено в узле"
+                    
+                    Dim tempNoNode As Object, tempNameNode As Object
+                    Set tempNoNode = foundItemNode.SelectSingleNode("*[local-name()='No']")
+                    Set tempNameNode = foundItemNode.SelectSingleNode("*[local-name()='Name']")
+
+                    If Not tempNoNode Is Nothing And Trim(tempNoNode.Text) <> "" And Not IsNullNode(tempNoNode) Then merlionNoVal = Trim(tempNoNode.Text) Else merlionNoVal = requestedArticul
+                    If Not tempNameNode Is Nothing And Not IsNullNode(tempNameNode) Then nameVal = Trim(tempNameNode.Text)
+                    
+                    tempDict("MerlionNo") = merlionNoVal
+                    tempDict("Name") = nameVal
+                    Debug.Print "  Parsed from getItems: MerlionNo='" & merlionNoVal & "', Name='" & nameVal & "'"
+                Else
+                    Debug.Print "Merlion_GetItem_API: Артикул '" & requestedArticul & "' не найден в XML-ответе (getItems - no matching item node)."
+                End If
+            Else
+                tempDict("Name") = "Ошибка парсинга XML (items)"
+                Debug.Print "Merlion_GetItem_API: Ошибка парсинга XML для '" & requestedArticul & "'. Причина: " & xmlResponseDoc.ParseError.reason
+            End If
+        Else
+            tempDict("Name") = "Ошибка API " & .Status & " (items)"
+            Debug.Print "Merlion_GetItem_API: Ошибка HTTP " & .Status & " для '" & requestedArticul & "'. " & .statusText
+        End If
+    End With
+    If itemResultsDict.Exists(Trim(requestedArticul)) Then itemResultsDict(Trim(requestedArticul)) = tempDict Else itemResultsDict.Add Trim(requestedArticul), tempDict
+CleanExit_Merlion_GetItem_API:
+    Set xmlResponseDoc = Nothing
+    Set tempDict = Nothing
+    Set foundItemNode = Nothing
+    Exit Sub
+ErrorHandler_Merlion_GetItem_API_Main:
+    Debug.Print "КРИТИЧЕСКАЯ ОШИБКА в Merlion_GetItem_API для '" & requestedArticul & "' на шаге '" & currentStep & "' (Строка Erl: " & Erl & "): " & Err.Number & " - " & Err.Description
+    Dim errDictCrit As Object: Set errDictCrit = CreateObject("Scripting.Dictionary")
+    errDictCrit("MerlionNo") = "ОШИБКА"
+    errDictCrit("Name") = "КРИТ.ОШИБКА (items)"
+    If Trim(requestedArticul) <> "" Then
+        If itemResultsDict.Exists(Trim(requestedArticul)) Then itemResultsDict(Trim(requestedArticul)) = errDictCrit Else itemResultsDict.Add Trim(requestedArticul), errDictCrit
+    End If
+    Resume CleanExit_Merlion_GetItem_API
+End Sub
+
+Private Sub Merlion_GetItemAvail_API(ByVal requestedArticul As String, ByRef availResultsDict As Object, ByRef httpObject As Object)
+    Dim xmlResponseDoc As Object, soapRequestBody As String, base64Credentials As String, shipmentDateStr As String
+    Dim currentStep As String, foundItemNode As Object
+
+    On Error GoTo ErrorHandler_Merlion_GetItemAvail_API_Main
+    currentStep = "Начало Merlion_GetItemAvail_API"
+
+    If Trim(requestedArticul) = "" Then Exit Sub
+    Debug.Print "Merlion_GetItemAvail_API: Артикул для запроса: " & requestedArticul
+
+    If httpObject Is Nothing Then Set httpObject = CreateObject("WinHttp.WinHttpRequest.5.1")
+    Set xmlResponseDoc = CreateObject("MSXML2.DOMDocument.6.0")
+    With xmlResponseDoc
+        .async = False
+        .SetProperty "SelectionLanguage", "XPath"
+        .SetProperty "SelectionNamespaces", "xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:mer='" & Replace(Replace(MER_NS_MERLION, "xmlns:mer='", ""), "'", "") & "'"
+    End With
+    
+    base64Credentials = EncodeBase64_Merlion(MERLION_LOGIN & ":" & MERLION_PASSWORD)
+    shipmentDateStr = Format(Date, "YYYY-MM-DD")
+
+    soapRequestBody = _
+        "<soapenv:Envelope " & SOAPENV_NS_MERLION & " " & MER_NS_MERLION & ">" & _
+        "   <soapenv:Header/>" & _
+        "   <soapenv:Body>" & _
+        "      <mer:getItemsAvail>" & _
+        "         <mer:login>" & EncodeXMLText_Merlion(MERLION_LOGIN) & "</mer:login>" & _
+        "         <mer:password>" & EncodeXMLText_Merlion(MERLION_PASSWORD) & "</mer:password>" & _
+        "         <mer:item_id>" & EncodeXMLText_Merlion(requestedArticul) & "</mer:item_id>" & _
+        "         <mer:shipment_method>" & EncodeXMLText_Merlion(MERLION_SHIPMENT_METHOD) & "</mer:shipment_method>" & _
+        "         <mer:shipment_date>" & shipmentDateStr & "</mer:shipment_date>" & _
+        "         <mer:only_avail>0</mer:only_avail>" & _
+        "      </mer:getItemsAvail>" & _
+        "   </soapenv:Body>" & _
+        "</soapenv:Envelope>"
+    Debug.Print "Merlion_GetItemAvail_API: Запрос для '" & requestedArticul & "': " & Left(soapRequestBody, 350) & "..."
+
+    Dim tempDict As Object: Set tempDict = CreateObject("Scripting.Dictionary")
+    tempDict("MerlionNo") = "N/A"
+    tempDict("Stock") = vbNullString
+    tempDict("PriceUSD") = "0"
+    tempDict("PriceClientRUB") = "0"
+    tempDict("RRP") = "0"
+
+    With httpObject
+        .Open "POST", MERLION_ENDPOINT_URL, False
+        .setRequestHeader "Content-Type", "text/xml;charset=UTF-8"
+        .setRequestHeader "Authorization", "Basic " & base64Credentials
+        .send soapRequestBody
+        Debug.Print "Merlion_GetItemAvail_API: Статус ответа для '" & requestedArticul & "': " & .Status
+
+        If .Status = 200 Then
+            Dim responseTextVal As String: responseTextVal = .responseText
+            If xmlResponseDoc.LoadXML(responseTextVal) Then
+                Dim itemNode As Object, nodesList As Object, childDetailNode As Object
+                Dim xPathQuery As String
+                xPathQuery = "//*[local-name()='Envelope']/*[local-name()='Body']/*[local-name()='getItemsAvailResponse']/*[local-name()='getItemsAvailResult']/*[local-name()='item']"
+                Set nodesList = xmlResponseDoc.SelectNodes(xPathQuery)
+                Set foundItemNode = Nothing ' Reset
+
+                If Not nodesList Is Nothing And nodesList.Length > 0 Then
+                     For Each itemNode In nodesList
+                        Dim noNode As Object
+                        Set noNode = itemNode.SelectSingleNode("*[local-name()='No']")
+                        If Not noNode Is Nothing Then
+                             If Trim(noNode.Text) = Trim(requestedArticul) Or nodesList.Length = 1 Then
+                                Set foundItemNode = itemNode
+                                Exit For
+                            End If
+                        End If
+                    Next itemNode
+                End If
+                
+                If Not foundItemNode Is Nothing Then
+                    Dim merlionNoVal As String, stockVal As String, priceUsdVal As String, priceRubVal As String, rrpVal As String
+                    merlionNoVal = "N/A": stockVal = "": priceUsdVal = "0": priceRubVal = "0": rrpVal = "0"
+
+                    Dim tempNoNode As Object, tempStockNode As Object, tempPriceUsdNode As Object, tempPriceRubNode As Object, tempRrpNode As Object
+                    Set tempNoNode = foundItemNode.SelectSingleNode("*[local-name()='No']")
+                    Set tempStockNode = foundItemNode.SelectSingleNode("*[local-name()='AvailableClient']")
+                    Set tempPriceUsdNode = foundItemNode.SelectSingleNode("*[local-name()='PriceClient']")
+                    Set tempPriceRubNode = foundItemNode.SelectSingleNode("*[local-name()='PriceClientRUB']")
+                    Set tempRrpNode = foundItemNode.SelectSingleNode("*[local-name()='RRP']")
+                    
+                    If Not tempNoNode Is Nothing And Trim(tempNoNode.Text) <> "" And Not IsNullNode(tempNoNode) Then merlionNoVal = Trim(tempNoNode.Text) Else merlionNoVal = requestedArticul
+                    If Not tempStockNode Is Nothing And Not IsNullNode(tempStockNode) Then stockVal = Trim(tempStockNode.Text)
+                    If Not tempPriceUsdNode Is Nothing And Not IsNullNode(tempPriceUsdNode) Then priceUsdVal = Trim(tempPriceUsdNode.Text)
+                    If Not tempPriceRubNode Is Nothing And Not IsNullNode(tempPriceRubNode) Then priceRubVal = Trim(tempPriceRubNode.Text)
+                    If Not tempRrpNode Is Nothing And Not IsNullNode(tempRrpNode) Then rrpVal = Trim(tempRrpNode.Text)
+
+                    tempDict("MerlionNo") = merlionNoVal
+                    tempDict("Stock") = stockVal
+                    tempDict("PriceUSD") = priceUsdVal
+                    tempDict("PriceClientRUB") = priceRubVal
+                    tempDict("RRP") = rrpVal
+                    Debug.Print "  Parsed from getItemsAvail: MerlionNo='" & merlionNoVal & "', Stock='" & stockVal & "', PriceUSD='" & priceUsdVal & "', PriceRUB='" & priceRubVal & "', RRP='" & rrpVal & "'"
+                Else
+                     Debug.Print "Merlion_GetItemAvail_API: Артикул '" & requestedArticul & "' не найден в XML-ответе (getItemsAvail - no matching item node)."
+                End If
+            Else
+                Debug.Print "Merlion_GetItemAvail_API: Ошибка парсинга XML для '" & requestedArticul & "'. Причина: " & xmlResponseDoc.ParseError.reason
+            End If
+        Else
+            Debug.Print "Merlion_GetItemAvail_API: Ошибка HTTP " & .Status & " для '" & requestedArticul & "'. " & .statusText
+        End If
+    End With
+    If availResultsDict.Exists(Trim(requestedArticul)) Then availResultsDict(Trim(requestedArticul)) = tempDict Else availResultsDict.Add Trim(requestedArticul), tempDict
+CleanExit_Merlion_GetItemAvail_API:
+    Set xmlResponseDoc = Nothing
+    Set tempDict = Nothing
+    Set foundItemNode = Nothing
+    Exit Sub
+ErrorHandler_Merlion_GetItemAvail_API_Main:
+    Debug.Print "КРИТИЧЕСКАЯ ОШИБКА в Merlion_GetItemAvail_API для '" & requestedArticul & "' на шаге '" & currentStep & "' (Строка Erl: " & Erl & "): " & Err.Number & " - " & Err.Description
+    Dim errDictCritical As Object: Set errDictCritical = CreateObject("Scripting.Dictionary")
+    errDictCritical("MerlionNo") = "ОШИБКА"
+    errDictCritical("Stock") = "ОШИБКА"
+    errDictCritical("PriceUSD") = "0"
+    errDictCritical("PriceClientRUB") = "0"
+    errDictCritical("RRP") = "0"
+    If Trim(requestedArticul) <> "" Then
+        If availResultsDict.Exists(Trim(requestedArticul)) Then availResultsDict(Trim(requestedArticul)) = errDictCritical Else availResultsDict.Add Trim(requestedArticul), errDictCritical
+    End If
+    Resume CleanExit_Merlion_GetItemAvail_API
+End Sub
+
+Private Function EncodeBase64_Merlion(sText As String) As String
+    Dim arrData() As Byte, objXML As Object, objNode As Object
+    On Error GoTo HELL_EncodeBase64_Merlion
+    arrData = StrConv(sText, vbFromUnicode)
+    Set objXML = CreateObject("MSXML2.DOMDocument.6.0")
+    Set objNode = objXML.createElement("b64")
+    objNode.DataType = "bin.base64": objNode.nodeTypedValue = arrData
+    EncodeBase64_Merlion = objNode.Text
+    Set objNode = Nothing: Set objXML = Nothing
+    Exit Function
+HELL_EncodeBase64_Merlion:
+    EncodeBase64_Merlion = ""
+    Debug.Print "Ошибка в EncodeBase64_Merlion: " & Err.Number & " - " & Err.Description
+End Function
+
+Private Function EncodeXMLText_Merlion(ByVal textToEncode As String) As String
+    If textToEncode = "" Then
+        EncodeXMLText_Merlion = ""
+        Exit Function
+    End If
+    Dim tempString As String
+    tempString = textToEncode
+    tempString = Replace(tempString, "&", "&")
+    tempString = Replace(tempString, "<", "<")
+    tempString = Replace(tempString, ">", ">")
+    tempString = Replace(tempString, "'", "'")
+    tempString = Replace(tempString, """", """")
+    EncodeXMLText_Merlion = tempString
+End Function
+
+' Helper function to check for xsi:nil="true"
+Private Function IsNullNode(node As Object) As Boolean
+    IsNullNode = False
+    If node Is Nothing Then
+        IsNullNode = True
+        Exit Function
+    End If
+    Dim nilAttr As Object
+    On Error Resume Next ' In case attribute doesn't exist
+    Set nilAttr = node.Attributes.getNamedItem("xsi:nil")
+    If Not nilAttr Is Nothing Then
+        If LCase(nilAttr.Text) = "true" Then
+            IsNullNode = True
+        End If
+    End If
+    On Error GoTo 0
+End Function
+

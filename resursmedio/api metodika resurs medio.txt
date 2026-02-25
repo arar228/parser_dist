@@ -1,0 +1,2362 @@
+This XML file does not appear to have any style information associated with it. The document tree is shown below.
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap12bind="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:soapbind="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://resurs-media.ru/api" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://resurs-media.ru/api" name="WSAPI" targetNamespace="http://resurs-media.ru/api">
+<types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xs1="http://resurs-media.ru/api" targetNamespace="http://resurs-media.ru/api" attributeFormDefault="unqualified" elementFormDefault="qualified">
+<xs:simpleType name="MaterialID">
+<xs:restriction base="xs:string">
+<xs:maxLength value="35"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="MaterialGroup">
+<xs:restriction base="xs:string">
+<xs:maxLength value="18"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="Count">
+<xs:restriction base="xs:integer">
+<xs:totalDigits value="9"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="QueryResult">
+<xs:restriction base="xs:integer">
+<xs:minInclusive value="0"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="UnitOfMeasurement">
+<xs:restriction base="xs:string">
+<xs:maxLength value="25"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="CharName">
+<xs:restriction base="xs:string">
+<xs:maxLength value="40"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="DocumentNumber">
+<xs:restriction base="xs:string">
+<xs:maxLength value="10"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="MaterialText">
+<xs:restriction base="xs:string">
+<xs:maxLength value="40"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="ClientID">
+<xs:restriction base="xs:integer">
+<xs:totalDigits value="8"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="Currency">
+<xs:restriction base="xs:string">
+<xs:minLength value="3"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="SuplyContractNumber">
+<xs:restriction base="xs:string">
+<xs:minLength value="1"/>
+<xs:maxLength value="100"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="WareHouseID">
+<xs:restriction base="xs:string">
+<xs:maxLength value="5"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="DeliveryAddressID">
+<xs:restriction base="xs:string">
+<xs:maxLength value="9"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="VendorPart">
+<xs:restriction base="xs:string">
+<xs:maxLength value="35"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:complexType name="ItemTableType">
+<xs:sequence>
+<xs:element name="MaterialID" type="tns:MaterialID"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="ItemTableType_Resp">
+<xs:complexContent>
+<xs:extension base="tns:ItemTableType">
+<xs:sequence>
+<xs:element name="PartNum" type="xs:string" nillable="true"/>
+<xs:element name="PartNumCust" type="xs:string" nillable="true" minOccurs="0"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="ItemTableTypeOrder_Resp">
+<xs:complexContent>
+<xs:extension base="tns:ItemTableType_Resp">
+<xs:sequence>
+<xs:element name="Quantity" type="tns:Count"/>
+<xs:element name="Price" type="xs:float"/>
+<xs:element name="Sum" type="xs:float"/>
+<xs:element name="PriceUSD" type="xs:float"/>
+<xs:element name="SumUSD" type="xs:float"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="Response_BaseType">
+<xs:sequence>
+<xs:element name="Result" type="tns:QueryResult"/>
+<xs:element name="ErrorMessage" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="MaterialID_Tab">
+<xs:sequence>
+<xs:element name="Item" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="tns:ItemTableType"/>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="MaterialGroup_Tab">
+<xs:sequence>
+<xs:element name="Item" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="MaterialGroup" type="tns:MaterialGroup"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="VendorPart_Tab">
+<xs:sequence>
+<xs:element name="Item" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="VendorPart" type="tns:MaterialID"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="OrderItems">
+<xs:sequence>
+<xs:element name="Item" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="tns:ItemTableType">
+<xs:sequence>
+<xs:element name="Quantity" type="tns:Count"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="SetFinalOrder_Req_OrderItems">
+<xs:sequence>
+<xs:element name="Item" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="tns:ItemTableType">
+<xs:sequence>
+<xs:element name="PurchaseOrderNumber" type="xs:string" nillable="true"/>
+<xs:element name="Quantity" type="tns:Count"/>
+<xs:element name="Reserve" type="xs:boolean" minOccurs="0"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="GetItemsAvail_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="Material_Tab" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="tns:ItemTableType_Resp">
+<xs:sequence>
+<xs:element name="AvailableCount" type="xs:string"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetMaterialData_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="MaterialData_Tab">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="Item" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="tns:ItemTableType_Resp">
+<xs:sequence>
+<xs:element name="MaterialText" type="xs:string" nillable="true"/>
+<xs:element name="MaterialTextCust" type="xs:string" minOccurs="0"/>
+<xs:element name="MaterialGroup" type="tns:MaterialGroup" nillable="true"/>
+<xs:element name="Vendor" type="xs:string" nillable="true"/>
+<xs:element name="VendorPart" type="xs:string" nillable="true"/>
+<xs:element name="UnitOfMeasurement" type="tns:UnitOfMeasurement" nillable="true"/>
+<xs:element name="Multiplicity" type="tns:Count" minOccurs="0"/>
+<xs:element name="Weight" type="xs:double" nillable="true"/>
+<xs:element name="Volume" type="xs:double" nillable="true"/>
+<xs:element name="Width" type="xs:float"/>
+<xs:element name="Length" type="xs:float"/>
+<xs:element name="Height" type="xs:float"/>
+<xs:element name="Kit" type="xs:boolean"/>
+<xs:element name="VAT" type="xs:string"/>
+<xs:element name="WebDescription" type="xs:string" minOccurs="0"/>
+<xs:element name="KitParts" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="PartID" type="tns:MaterialID"/>
+<xs:element name="Quantity" type="tns:Count"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="MaterialCharacteristics" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="Name" type="xs:string"/>
+<xs:element name="Value" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="BarCodes" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="BarCode" type="xs:string"/>
+<xs:element name="BarCodeType" type="xs:string"/>
+<xs:element name="UnitOfMeasurement" type="tns:UnitOfMeasurement"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="Certificate" minOccurs="0">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="Beginning" nillable="true">
+<xs:simpleType>
+<xs:union memberTypes="xs:string xs:date"/>
+</xs:simpleType>
+</xs:element>
+<xs:element name="Expiration" type="xs:date" nillable="true"/>
+<xs:element name="Number" type="xs:string" nillable="true"/>
+<xs:element name="IssuedBy" type="xs:string" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="Images" minOccurs="0">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="Image" type="xs:string" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetExcludedDates_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="ExcludedDates">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="ExcludedDate" type="xs:date" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetOrderItems_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="OrderItems">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="Item" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="tns:ItemTableTypeOrder_Resp"/>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="Response">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="OperationID" type="xs:string"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetOperationResult_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="DocumentNumber" type="tns:DocumentNumber" minOccurs="0"/>
+<xs:element name="OrderItems" minOccurs="0">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="Item" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="tns:ItemTableTypeOrder_Resp">
+<xs:sequence>
+<xs:element name="DocumentNumber" type="tns:DocumentNumber"/>
+<xs:element name="PurchaseOrderNumber" type="xs:string" nillable="true"/>
+<xs:element name="PosResult" type="tns:QueryResult"/>
+<xs:element name="PosError" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="OrderHeader">
+<xs:sequence>
+<xs:element name="ClientID" type="tns:ClientID"/>
+<xs:element name="ConsigneeID" type="tns:ClientID" nillable="true" minOccurs="0"/>
+<xs:element name="SuplyContract" type="tns:SuplyContractNumber" nillable="true" minOccurs="0"/>
+<xs:element name="ShipmentDate" type="xs:date" nillable="true" minOccurs="0"/>
+<xs:element name="WareHouseID" type="tns:WareHouseID" nillable="true" minOccurs="0"/>
+<xs:element name="DeliveryType" type="xs:string" nillable="true" minOccurs="0"/>
+<xs:element name="DeliveryAddressID" type="tns:DeliveryAddressID" nillable="true" minOccurs="0"/>
+<xs:element name="PurchaseOrderNumber" type="xs:string" nillable="true" minOccurs="0"/>
+<xs:element name="Comment" type="xs:string" nillable="true" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="GetClientsAvail_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="ClientsInfo" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="ClientID" type="tns:ClientID"/>
+<xs:element name="ClientName">
+<xs:simpleType>
+<xs:restriction base="xs:string">
+<xs:maxLength value="200"/>
+</xs:restriction>
+</xs:simpleType>
+</xs:element>
+<xs:element name="INN" nillable="true">
+<xs:simpleType>
+<xs:restriction base="xs:string">
+<xs:maxLength value="12"/>
+</xs:restriction>
+</xs:simpleType>
+</xs:element>
+<xs:element name="KPP" nillable="true">
+<xs:simpleType>
+<xs:restriction base="xs:string">
+<xs:maxLength value="9"/>
+</xs:restriction>
+</xs:simpleType>
+</xs:element>
+<xs:element name="LegalAddress" nillable="true">
+<xs:simpleType>
+<xs:restriction base="xs:string">
+<xs:maxLength value="150"/>
+</xs:restriction>
+</xs:simpleType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetContracts_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="ContractsInfo" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="ClientID" type="tns:ClientID"/>
+<xs:element name="Supplier" type="xs:string"/>
+<xs:element name="Number" type="tns:SuplyContractNumber"/>
+<xs:element name="Date" type="xs:date"/>
+<xs:element name="Currency" type="tns:Currency"/>
+<xs:element name="Delay" type="xs:integer"/>
+<xs:element name="AdmissibleDebt" type="xs:float"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetWareHousesID_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="WareHousesInfo" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="ClientID" type="tns:ClientID"/>
+<xs:element name="WareHouseID" type="tns:WareHouseID"/>
+<xs:element name="WareHouseName" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetDeliveryTypes_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="DeliveryTypesInfo" nillable="true" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="ClientID" type="tns:ClientID"/>
+<xs:element name="DeliveryType" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetDeliveryAddresses_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="DeliveryAddressesInfo" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="ClientID" type="tns:ClientID"/>
+<xs:element name="DeliveryAddressID" type="tns:DeliveryAddressID"/>
+<xs:element name="DeliveryAddress" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetDeliveryCities_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="DeliveryCitiesInfo" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="Name" type="xs:string"/>
+<xs:element name="Region" type="xs:string"/>
+<xs:element name="DeliveryMethod" type="xs:string"/>
+<xs:element name="ClassificationCode">
+<xs:simpleType>
+<xs:restriction base="xs:nonNegativeInteger">
+<xs:totalDigits value="25"/>
+</xs:restriction>
+</xs:simpleType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetOrderHeader_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="OrderHeader" nillable="true" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="tns:OrderHeader">
+<xs:sequence>
+<xs:element name="DocumentNumber" type="tns:DocumentNumber"/>
+<xs:element name="OrderDate" type="xs:date"/>
+<xs:element name="Status" type="xs:string" minOccurs="0"/>
+<xs:element name="Sum" type="xs:float"/>
+<xs:element name="SumUSD" type="xs:float"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetPrices_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="Material_Tab" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="tns:ItemTableType_Resp">
+<xs:sequence>
+<xs:element name="Price" type="xs:float"/>
+<xs:element name="PriceUSD" type="xs:float"/>
+<xs:element name="AvailableCount" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetCatalog_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="MaterialGroup_Tab" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="MaterialGroup" type="tns:MaterialGroup"/>
+<xs:element name="MaterialGroupParent" type="tns:MaterialGroup"/>
+<xs:element name="Name" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="OrderNumbers">
+<xs:sequence>
+<xs:element name="OrderNumber" type="tns:DocumentNumber" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="Notification_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="Notification" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="Text" type="xs:string"/>
+<xs:element name="Attachment" type="xs:base64Binary" minOccurs="0"/>
+<xs:element name="AttachmentName" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+<xs:attribute name="NotificationID" type="xs:string" use="required"/>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:element name="GetCatalog">
+<xs:complexType>
+<xs:sequence/>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetCatalogResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetCatalog_Resp"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetClientsAvail">
+<xs:complexType>
+<xs:sequence/>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetClientsAvailResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetClientsAvail_Resp" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetContracts">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="ClientID" type="tns:ClientID" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetContractsResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetContracts_Resp" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetDeliveryAddresses">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="ClientID" type="tns:ClientID" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetDeliveryAddressesResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetDeliveryAddresses_Resp"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetDeliveryCities">
+<xs:complexType>
+<xs:sequence/>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetDeliveryCitiesResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetDeliveryCities_Resp"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetDeliveryTypes">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="ClientID" type="tns:ClientID" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetDeliveryTypesResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetDeliveryTypes_Resp" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetExcludedDates">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="Date_From" type="xs:date"/>
+<xs:element name="Date_To" type="xs:date"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetExcludedDatesResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetExcludedDates_Resp"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetItemsAvail">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="WareHouseID" type="tns:WareHouseID"/>
+<xs:element name="MaterialID_Tab" type="tns:MaterialID_Tab" nillable="true"/>
+<xs:element name="MaterialGroup_Tab" type="tns:MaterialGroup_Tab" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetItemsAvailResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetItemsAvail_Resp"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetMaterialData">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="MaterialID_Tab" type="tns:MaterialID_Tab" nillable="true"/>
+<xs:element name="MaterialGroup_Tab" type="tns:MaterialGroup_Tab" nillable="true"/>
+<xs:element name="VendorPart_Tab" type="tns:VendorPart_Tab" nillable="true"/>
+<xs:element name="WithCharacteristics" type="xs:boolean" nillable="true"/>
+<xs:element name="WithBarCodes" type="xs:boolean" nillable="true"/>
+<xs:element name="WithCertificates" type="xs:boolean" nillable="true"/>
+<xs:element name="WithImages" type="xs:boolean" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetMaterialDataResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetMaterialData_Resp"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetOperationResult">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="OperationID" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetOperationResultResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetOperationResult_Resp"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetOrderHeader">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="DocumentNumber" type="tns:DocumentNumber" nillable="true"/>
+<xs:element name="Dispatched" type="xs:boolean" nillable="true"/>
+<xs:element name="StartDate" type="xs:date" nillable="true"/>
+<xs:element name="EndDate" type="xs:date" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetOrderHeaderResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetOrderHeader_Resp"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetOrderItems">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="DocumentNumber" type="tns:DocumentNumber"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetOrderItemsResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetOrderItems_Resp"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetPrices">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="WareHouseID" type="tns:WareHouseID"/>
+<xs:element name="MaterialID_Tab" type="tns:MaterialID_Tab" nillable="true"/>
+<xs:element name="MaterialGroup_Tab" type="tns:MaterialGroup_Tab" nillable="true"/>
+<xs:element name="GetAvailableCount" type="xs:boolean" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetPricesResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetPrices_Resp"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetWareHouses">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="ClientID" type="tns:ClientID" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetWareHousesResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetWareHousesID_Resp" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetDeleteOrder">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="DocumentNumber" type="tns:DocumentNumber"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetDeleteOrderResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:Response"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetFinalOrder">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="DocumentNumber" type="tns:DocumentNumber"/>
+<xs:element name="OrderItems" type="tns:SetFinalOrder_Req_OrderItems" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetFinalOrderResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:Response"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetOrderChange">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="DocumentNumber" type="tns:DocumentNumber"/>
+<xs:element name="OrderHeader" type="tns:OrderHeader" nillable="true"/>
+<xs:element name="OrderItems" type="tns:OrderItems" nillable="true"/>
+<xs:element name="Reserve" type="xs:boolean" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetOrderChangeResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:Response"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetOrderCreate">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="OrderHeader" type="tns:OrderHeader"/>
+<xs:element name="OrderItems" type="tns:OrderItems"/>
+<xs:element name="Reserve" type="xs:boolean" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetOrderCreateResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:Response"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetOrderMerge">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="OrderHeader" type="tns:OrderHeader"/>
+<xs:element name="OrderNumbers" type="tns:OrderNumbers"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetOrderMergeResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:Response"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetSignOrder">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="DocumentNumber" type="tns:DocumentNumber"/>
+<xs:element name="OrderHeader" type="tns:OrderHeader"/>
+<xs:element name="OrderItems" type="tns:OrderItems"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetSignOrderResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:Response"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="DispatchOrder">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="DocumentNumber" type="tns:DocumentNumber"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="DispatchOrderResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:Response"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="Notification">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="FromDate" type="xs:date" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="NotificationResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:Notification_Resp"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:schema>
+</types>
+<message name="GetCatalogRequestMessage">
+<part name="parameters" element="tns:GetCatalog"/>
+</message>
+<message name="GetCatalogResponseMessage">
+<part name="parameters" element="tns:GetCatalogResponse"/>
+</message>
+<message name="GetClientsAvailRequestMessage">
+<part name="parameters" element="tns:GetClientsAvail"/>
+</message>
+<message name="GetClientsAvailResponseMessage">
+<part name="parameters" element="tns:GetClientsAvailResponse"/>
+</message>
+<message name="GetContractsRequestMessage">
+<part name="parameters" element="tns:GetContracts"/>
+</message>
+<message name="GetContractsResponseMessage">
+<part name="parameters" element="tns:GetContractsResponse"/>
+</message>
+<message name="GetDeliveryAddressesRequestMessage">
+<part name="parameters" element="tns:GetDeliveryAddresses"/>
+</message>
+<message name="GetDeliveryAddressesResponseMessage">
+<part name="parameters" element="tns:GetDeliveryAddressesResponse"/>
+</message>
+<message name="GetDeliveryCitiesRequestMessage">
+<part name="parameters" element="tns:GetDeliveryCities"/>
+</message>
+<message name="GetDeliveryCitiesResponseMessage">
+<part name="parameters" element="tns:GetDeliveryCitiesResponse"/>
+</message>
+<message name="GetDeliveryTypesRequestMessage">
+<part name="parameters" element="tns:GetDeliveryTypes"/>
+</message>
+<message name="GetDeliveryTypesResponseMessage">
+<part name="parameters" element="tns:GetDeliveryTypesResponse"/>
+</message>
+<message name="GetExcludedDatesRequestMessage">
+<part name="parameters" element="tns:GetExcludedDates"/>
+</message>
+<message name="GetExcludedDatesResponseMessage">
+<part name="parameters" element="tns:GetExcludedDatesResponse"/>
+</message>
+<message name="GetItemsAvailRequestMessage">
+<part name="parameters" element="tns:GetItemsAvail"/>
+</message>
+<message name="GetItemsAvailResponseMessage">
+<part name="parameters" element="tns:GetItemsAvailResponse"/>
+</message>
+<message name="GetMaterialDataRequestMessage">
+<part name="parameters" element="tns:GetMaterialData"/>
+</message>
+<message name="GetMaterialDataResponseMessage">
+<part name="parameters" element="tns:GetMaterialDataResponse"/>
+</message>
+<message name="GetOperationResultRequestMessage">
+<part name="parameters" element="tns:GetOperationResult"/>
+</message>
+<message name="GetOperationResultResponseMessage">
+<part name="parameters" element="tns:GetOperationResultResponse"/>
+</message>
+<message name="GetOrderHeaderRequestMessage">
+<part name="parameters" element="tns:GetOrderHeader"/>
+</message>
+<message name="GetOrderHeaderResponseMessage">
+<part name="parameters" element="tns:GetOrderHeaderResponse"/>
+</message>
+<message name="GetOrderItemsRequestMessage">
+<part name="parameters" element="tns:GetOrderItems"/>
+</message>
+<message name="GetOrderItemsResponseMessage">
+<part name="parameters" element="tns:GetOrderItemsResponse"/>
+</message>
+<message name="GetPricesRequestMessage">
+<part name="parameters" element="tns:GetPrices"/>
+</message>
+<message name="GetPricesResponseMessage">
+<part name="parameters" element="tns:GetPricesResponse"/>
+</message>
+<message name="GetWareHousesRequestMessage">
+<part name="parameters" element="tns:GetWareHouses"/>
+</message>
+<message name="GetWareHousesResponseMessage">
+<part name="parameters" element="tns:GetWareHousesResponse"/>
+</message>
+<message name="SetDeleteOrderRequestMessage">
+<part name="parameters" element="tns:SetDeleteOrder"/>
+</message>
+<message name="SetDeleteOrderResponseMessage">
+<part name="parameters" element="tns:SetDeleteOrderResponse"/>
+</message>
+<message name="SetFinalOrderRequestMessage">
+<part name="parameters" element="tns:SetFinalOrder"/>
+</message>
+<message name="SetFinalOrderResponseMessage">
+<part name="parameters" element="tns:SetFinalOrderResponse"/>
+</message>
+<message name="SetOrderChangeRequestMessage">
+<part name="parameters" element="tns:SetOrderChange"/>
+</message>
+<message name="SetOrderChangeResponseMessage">
+<part name="parameters" element="tns:SetOrderChangeResponse"/>
+</message>
+<message name="SetOrderCreateRequestMessage">
+<part name="parameters" element="tns:SetOrderCreate"/>
+</message>
+<message name="SetOrderCreateResponseMessage">
+<part name="parameters" element="tns:SetOrderCreateResponse"/>
+</message>
+<message name="SetOrderMergeRequestMessage">
+<part name="parameters" element="tns:SetOrderMerge"/>
+</message>
+<message name="SetOrderMergeResponseMessage">
+<part name="parameters" element="tns:SetOrderMergeResponse"/>
+</message>
+<message name="SetSignOrderRequestMessage">
+<part name="parameters" element="tns:SetSignOrder"/>
+</message>
+<message name="SetSignOrderResponseMessage">
+<part name="parameters" element="tns:SetSignOrderResponse"/>
+</message>
+<message name="DispatchOrderRequestMessage">
+<part name="parameters" element="tns:DispatchOrder"/>
+</message>
+<message name="DispatchOrderResponseMessage">
+<part name="parameters" element="tns:DispatchOrderResponse"/>
+</message>
+<message name="NotificationRequestMessage">
+<part name="parameters" element="tns:Notification"/>
+</message>
+<message name="NotificationResponseMessage">
+<part name="parameters" element="tns:NotificationResponse"/>
+</message>
+<portType name="WSAPIPortType">
+<operation name="GetCatalog">
+<input message="tns:GetCatalogRequestMessage"/>
+<output message="tns:GetCatalogResponseMessage"/>
+</operation>
+<operation name="GetClientsAvail">
+<input message="tns:GetClientsAvailRequestMessage"/>
+<output message="tns:GetClientsAvailResponseMessage"/>
+</operation>
+<operation name="GetContracts">
+<input message="tns:GetContractsRequestMessage"/>
+<output message="tns:GetContractsResponseMessage"/>
+</operation>
+<operation name="GetDeliveryAddresses">
+<input message="tns:GetDeliveryAddressesRequestMessage"/>
+<output message="tns:GetDeliveryAddressesResponseMessage"/>
+</operation>
+<operation name="GetDeliveryCities">
+<input message="tns:GetDeliveryCitiesRequestMessage"/>
+<output message="tns:GetDeliveryCitiesResponseMessage"/>
+</operation>
+<operation name="GetDeliveryTypes">
+<input message="tns:GetDeliveryTypesRequestMessage"/>
+<output message="tns:GetDeliveryTypesResponseMessage"/>
+</operation>
+<operation name="GetExcludedDates">
+<input message="tns:GetExcludedDatesRequestMessage"/>
+<output message="tns:GetExcludedDatesResponseMessage"/>
+</operation>
+<operation name="GetItemsAvail">
+<input message="tns:GetItemsAvailRequestMessage"/>
+<output message="tns:GetItemsAvailResponseMessage"/>
+</operation>
+<operation name="GetMaterialData">
+<input message="tns:GetMaterialDataRequestMessage"/>
+<output message="tns:GetMaterialDataResponseMessage"/>
+</operation>
+<operation name="GetOperationResult">
+<input message="tns:GetOperationResultRequestMessage"/>
+<output message="tns:GetOperationResultResponseMessage"/>
+</operation>
+<operation name="GetOrderHeader">
+<input message="tns:GetOrderHeaderRequestMessage"/>
+<output message="tns:GetOrderHeaderResponseMessage"/>
+</operation>
+<operation name="GetOrderItems">
+<input message="tns:GetOrderItemsRequestMessage"/>
+<output message="tns:GetOrderItemsResponseMessage"/>
+</operation>
+<operation name="GetPrices">
+<input message="tns:GetPricesRequestMessage"/>
+<output message="tns:GetPricesResponseMessage"/>
+</operation>
+<operation name="GetWareHouses">
+<input message="tns:GetWareHousesRequestMessage"/>
+<output message="tns:GetWareHousesResponseMessage"/>
+</operation>
+<operation name="SetDeleteOrder">
+<input message="tns:SetDeleteOrderRequestMessage"/>
+<output message="tns:SetDeleteOrderResponseMessage"/>
+</operation>
+<operation name="SetFinalOrder">
+<input message="tns:SetFinalOrderRequestMessage"/>
+<output message="tns:SetFinalOrderResponseMessage"/>
+</operation>
+<operation name="SetOrderChange">
+<input message="tns:SetOrderChangeRequestMessage"/>
+<output message="tns:SetOrderChangeResponseMessage"/>
+</operation>
+<operation name="SetOrderCreate">
+<input message="tns:SetOrderCreateRequestMessage"/>
+<output message="tns:SetOrderCreateResponseMessage"/>
+</operation>
+<operation name="SetOrderMerge">
+<input message="tns:SetOrderMergeRequestMessage"/>
+<output message="tns:SetOrderMergeResponseMessage"/>
+</operation>
+<operation name="SetSignOrder">
+<input message="tns:SetSignOrderRequestMessage"/>
+<output message="tns:SetSignOrderResponseMessage"/>
+</operation>
+<operation name="DispatchOrder">
+<input message="tns:DispatchOrderRequestMessage"/>
+<output message="tns:DispatchOrderResponseMessage"/>
+</operation>
+<operation name="Notification">
+<input message="tns:NotificationRequestMessage"/>
+<output message="tns:NotificationResponseMessage"/>
+</operation>
+</portType>
+<binding name="WSAPISoapBinding" type="tns:WSAPIPortType">
+<soapbind:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+<operation name="GetCatalog">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetCatalog"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetClientsAvail">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetClientsAvail"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetContracts">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetContracts"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetDeliveryAddresses">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetDeliveryAddresses"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetDeliveryCities">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetDeliveryCities"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetDeliveryTypes">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetDeliveryTypes"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetExcludedDates">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetExcludedDates"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetItemsAvail">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetItemsAvail"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetMaterialData">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetMaterialData"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetOperationResult">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetOperationResult"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetOrderHeader">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetOrderHeader"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetOrderItems">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetOrderItems"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetPrices">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetPrices"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetWareHouses">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetWareHouses"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetDeleteOrder">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetDeleteOrder"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetFinalOrder">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetFinalOrder"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetOrderChange">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetOrderChange"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetOrderCreate">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetOrderCreate"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetOrderMerge">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetOrderMerge"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetSignOrder">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetSignOrder"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="DispatchOrder">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:DispatchOrder"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="Notification">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:Notification"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+</binding>
+<binding name="WSAPISoap12Binding" type="tns:WSAPIPortType">
+<soap12bind:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+<operation name="GetCatalog">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetCatalog"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetClientsAvail">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetClientsAvail"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetContracts">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetContracts"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetDeliveryAddresses">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetDeliveryAddresses"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetDeliveryCities">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetDeliveryCities"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetDeliveryTypes">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetDeliveryTypes"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetExcludedDates">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetExcludedDates"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetItemsAvail">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetItemsAvail"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetMaterialData">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetMaterialData"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetOperationResult">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetOperationResult"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetOrderHeader">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetOrderHeader"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetOrderItems">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetOrderItems"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetPrices">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetPrices"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetWareHouses">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetWareHouses"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetDeleteOrder">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetDeleteOrder"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetFinalOrder">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetFinalOrder"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetOrderChange">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetOrderChange"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetOrderCreate">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetOrderCreate"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetOrderMerge">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetOrderMerge"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetSignOrder">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetSignOrder"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="DispatchOrder">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:DispatchOrder"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="Notification">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:Notification"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+</binding>
+<service name="WSAPI">
+<port name="WSAPISoap" binding="tns:WSAPISoapBinding">
+<documentation>
+<wsi:Claim xmlns:wsi="http://ws-i.org/schemas/conformanceClaim/" conformsTo="http://ws-i.org/profiles/basic/1.1"/>
+</documentation>
+<soapbind:address location="https://api.resurs-media.ru/resursmedia/ws/WSAPI"/>
+</port>
+<port name="WSAPISoap12" binding="tns:WSAPISoap12Binding">
+<soap12bind:address location="https://api.resurs-media.ru/resursmedia/ws/WSAPI"/>
+</port>
+</service>
+</definitions>
+
+
+
+ 
+ 
+ 
+  
+ 
+ 
+Интернет заказ 
+Функциональная спецификация API модуля 7.5 
+Ресурс-Медиа 
+ 
+ 
+2 
+Ресурс-Медиа © 2024 
+Оглавление 
+ 
+1. Общие положения ................................................................................................................... 4 
+Цель документа ....................................................................................................................................... 4 
+Описание .................................................................................................................................................. 4 
+Методические требования к работе с данными .................................................................................. 4 
+Общее описание методики работы с заказом ...................................................................................... 5 
+2. Ограничения вызовов операций API..................................................................................... 7 
+2.1. Подсистема управления интервалами между вызовами одной и той же операции ........... 7 
+2.2. Режим отключения работы с заказами ..................................................................................... 8 
+3. Статусные поля результата вызова операции: Result и ErrorMessage .............................. 10 
+Result ....................................................................................................................................................... 10 
+ErrorMessage .......................................................................................................................................... 10 
+4. Описание операций API........................................................................................................ 11 
+4.1. Получение данных по номенклатуре ...................................................................................... 11 
+GetCatalog ........................................................................................................................................... 11 
+GetMaterialData.................................................................................................................................. 11 
+4.2. Получение данных для доставки ............................................................................................. 13 
+GetDeliveryAddresses ......................................................................................................................... 13 
+GetDeliveryCities ................................................................................................................................. 14 
+GetDeliveryTypes ................................................................................................................................ 14 
+GetExcludedDates ............................................................................................................................... 15 
+4.3. Получение данных по контрагентам ....................................................................................... 15 
+GetClientsAvail .................................................................................................................................... 15 
+GetContracts ....................................................................................................................................... 16 
+GetWareHouses .................................................................................................................................. 16 
+4.4. Получение остатков и цен ........................................................................................................ 17 
+GetPrices ............................................................................................................................................. 17 
+GetItemsAvail ...................................................................................................................................... 17 
+4.5. Получение данных по заказам ................................................................................................. 18 
+GetOrderHeader .................................................................................................................................. 18 
+GetOrderItems .................................................................................................................................... 19 
+4.6. Работа с заказами ...................................................................................................................... 19 
+GetOperationResult ............................................................................................................................ 20 
+SetOrderCreate ................................................................................................................................... 20 
+SetOrderChange .................................................................................................................................. 21 
+ 
+3 
+Ресурс-Медиа © 2024 
+SetDeleteOrder ................................................................................................................................... 22 
+SetSignOrder ....................................................................................................................................... 22 
+SetFinalOrder ...................................................................................................................................... 23 
+SetOrderMerge ................................................................................................................................... 24 
+DispatchOrder ..................................................................................................................................... 24 
+4.7. Сервисные операции ................................................................................................................ 25 
+Notification .......................................................................................................................................... 25 
+Отличия от предыдущих версий ................................................................................................. 26 
+Отличия от версии 7.1 ........................................................................................................................... 26 
+Отличия от версии 7.2 ........................................................................................................................... 26 
+Отличия от версии 7.3 ........................................................................................................................... 26 
+Отличия от версии 7.4 ........................................................................................................................... 27 
+ 
+1. Общие положения 
+Цель документа  
+Для оперативного создания и изменения заказов, а также получения информации об их 
+состоянии  необходимо настроить  взаимодействие между учетными системами Ресурс-Медиа (РМ) 
+и покупателей (в дальнейшем - Пользователь). В предлагаемом документе описан порядок настроек 
+таких систем с помощью операций API. 
+Описание 
+Обмен данными производится с помощью XML-сообщений. Сервис работает по протоколу 
+SOAP, с помощью которого реализован удаленный вызов процедур, и позволяет выполнять 
+удаленные запросы к базе данных Ресурс-Медиа для модификации заказов, получения информации 
+о состоянии заказов, остатках товаров, характеристик номенклатуры и проч. Работа сервиса 
+осуществляется в целях обеспечения безопасности по протоколу HTTPS. 
+Методические требования к работе с данными 
+Алгоритмы запросов к базе РМ должны быть построены так, чтобы минимизировать 
+количество запросов. Для этого редко изменяемые данные, запрашиваемые Пользователем из базы 
+РМ, должны храниться в его базе. Например, результаты, возвращаемые операциями 
+GetMaterialData (для одних и тех же номенклатур), GetClientsAvail, GetWareHouses и др. будут 
+практически всегда одинаковые.  
+Предполагаемая методика использования API для получения цен и остатков: 
+1. Получить GetCatalog - сохранить в своей базе. 
+2. Получить GetMaterialData по всем интересующим товарным группам - сохранить в своей базе 
+все необходимые для вашей работы поля. 
+3. Если по какой-то причине не используются операции GetPrices и GetItemsAvail, но очень 
+критично появление новинок, то данные из предыдущих пунктов обновлять периодически, 
+например, каждые 2 часа. Иначе – см. далее. 
+4. По необходимости вызывать GetPrices для каждого склада (с ограничивающими параметрами 
+или без), связать результат по MaterialID с хранимой у себя таблицей из п.2 - получить всю 
+необходимую информацию о номенклатуре. 
+Ресурс-Медиа © 2024 
+4 
+5. Если в пункте 4 вернулись номенклатуры, которые отсутствуют в сохраненной у вас таблице 
+(т.е. новинки за последние часы), вызвать по ним GetMaterialData, сохранить.  
+6. Поскольку цены меняются не так часто, как остатки, Пользователь может организовать у себя 
+хранение цен последнего запроса и между обновлениями прайса вызывать GetItemsAvail - этот 
+запрос заметно легче. 
+Общее описание методики работы с заказом  
+Заказ создается операцией SetOrderCreate. После этого его можно изменять произвольное 
+количество раз до наступления события подписи или финализации заказа. Для изменения 
+используется операция SetOrderChange. Для того, чтобы заказ был принят в работу менеджерами 
+РМ или для самостоятельной передачи заказа в набор, необходимо выполнить операции подписи 
+(необязательна) и финализации. Подпись выполняется операцией SetSignOrder. После выполнения 
+этой операции в базе РМ у заказа появляется признак того, что он подписан и не может быть изменен 
+операцией SetOrderChange. Последним этапом выполняется SetFinalOrder, которая может 
+разбить изначальный заказ на несколько (например, при необходимости доставки частями). Также 
+финализация может производиться без предварительной подписи заказа. После выполнения этой 
+операции у заказа устанавливается соответствующий признак, и применение к нему любых 
+операций Set* становится недоступным. Однако в любой момент можно читать данные по заказу 
+операциями GetOrderHeader и GetOrderItems. 
+Примечание. SetSignOrder введена для схемы с 
+двухступенчатым утверждением заказа на стороне 
+Пользователя, когда разные ответственные лица занимаются 
+утверждением заказа и его дальнейшим продвижением по 
+бизнесс-процессам. Если такая схема не применяется, то 
+использование этой операции нецелесообразно. 
+Операции Set* при своем вызове помещаются в общую очередь команд и в ответе возвращают 
+идентификатор, с которым они зарегистрировались в очереди. Обработка очереди происходит через 
+определенные промежутки времени (например, каждые 10 сек). Результат выполнения операций 
+Set* можно получить операцией GetOperationResult. 
+Важно! Не делайте вызов GetOperationResult просто в 
+цикле! Обеспечьте интервал (см. описание Подсистема 
+управления интервалами между вызовами одной и той же 
+операции) как после вызова операции Set*, для которой она 
+Ресурс-Медиа © 2024 
+5 
+вызывается, 
+так и между повторными вызовами 
+GetOperationResult .  
+Резервы, не переведенные в течение суток в набор на склад, отменяются. При этом сам заказ 
+остается в учетной системе РМ. При необходимости, Пользователь может пересмотреть его состав 
+и попытаться снова выполнить резервирование. 
+Ресурс-Медиа © 2024 
+6 
+2. Ограничения вызовов операций API 
+2.1. 
+Подсистема управления интервалами между вызовами 
+одной и той же операции 
+Данная подсистема предназначена для регулирования нагрузки на нашу учетную систему. 
+Через неё проходят абсолютно все операции API в момент их вызова. Результат её работы 
+проявляется в виде разрешения или запрещения дальнейшего выполнения алгоритма вызываемой 
+операции. Если подсистема определила, что данный вызов запрещен, то в поле Result любой 
+операции будет установлено значение 3, а в поле ErrorMessage – текст описания причины отказа. 
+Разработчикам, осуществляющим интеграцию пользователей с нашим API, необходимо обеспечить 
+трансляцию этих сообщений ответственным лицам пользователей для понимания ими причин 
+отказа и корректировки своих действий.  
+На текущий момент реализован контроль паузы между вызовами. В дальнейшем не 
+исключена реализация контроля и других параметров. Рассмотрим примеры. 
+Пример 1. Пользователь осуществляет вызов GetMaterialData с отбором по MaterailID и 
+передает туда список из 500 позиций. Если подсистема определит, что данный вызов делается чаще 
+разрешенного интервала, то пользователь получит: Result = 3, ErrorMessage = «Разрешенный 
+интервал вызова GetMaterialData: 1800 сек» (сообщение может отличаться) Поэтому мы 
+рекомендуем организовывать интеграцию таким образом, чтобы у конечного Пользователя (или 
+алгоритма, если интеграция предполагает полную автоматизацию) была возможность реагировать 
+на ошибку 3 изменением своего поведения. 
+Пример 2. Пользователь осуществил вызов операции SetOrderCreate. При этом 
+непосредственно вызов вернул Result = 0, т.е. он прошел контроль, и она помещена в очередь. После 
+этого Пользователь пытается получить результат этой операции вызовом GetOperationResult. 
+Предположим, Пользователь не учел, что данная операция также может иметь ограничения по 
+частоте вызовов и делает два вызова с интервалом, например, 1 сек. В этом случае первый вызов 
+вернет Result = 2, что говорит о том, что операция SetOrderCreate находится в обработке, второй же 
+вызов вернет Result = 3 и  ErrorMessage что-то вроде «Разрешенный интервал вызова 
+GetOperationResult: 9 сек», и означает это, что отказ в доступе получил именно GetOperationResult, 
+а не SetOrderCreate. 
+Выбор момента времени для вычисления интервала между вызовами одной и той же операции 
+может осуществляться двумя способами:  
+Ресурс-Медиа © 2024 
+7 
+1. от последнего разрешенного вызова;  
+2. просто от последнего вызова.  
+В первом случае операция получит разрешение по истечении заданного интервала независимо 
+от количества вызовов, которые попытался сделать Пользователь за этот интервал. Во втором 
+случае отсчет начинается заново от последней попытки вызова, т.о. если пользователь игнорирует 
+сообщение о неистечении интервала и продолжит делать попытки вызова операции, разрешение он 
+не получит «никогда». 
+Пример. Вызов GetPrices был осуществлен в 14:00 и получил разрешение (вернул прайс). В 
+14:10 была осуществлена повторная попытка вызова и получен ответ: Result = 3, ErrorMessage = 
+«Разрешенный интервал вызова GetPrices: 3600 сек» (сообщение может отличаться). Если для 
+правила, под которое попадает этот вызов, установлен контроль по первому способу, то сколько бы 
+раз Пользователь ни пытался вызвать эту операцию, следующее разрешение он получит с 15:00. 
+Если для этого правила контроль установлен по второму способу, то для ситуации, описанной в 
+примере, отсчет начнется уже с 14:10 и если не будет ни одного вызова в течение 3600 сек, то 
+следующее разрешение будет получено не ранее 15:10, если же Пользователь сделает вызов, 
+скажем, в 14:40, то отсчет начнется именно с этого момента. 
+Следует учесть, что правила доступа могут зависеть не только от имени операции, но и от 
+передаваемых в нее параметров. Например, интервал между вызовами GetPrices тем больше, чем 
+больше запрашиваемая в нем информация: по всему каталогу, по одной позиции, по тысяче и т.п. 
+(цифры условные). 
+Важно! Все результаты по получению разрешений 
+фиксируются, и если будет выявлено систематическое 
+игнорирование Пользователем предупреждений от 
+данной системы, то его доступ к API может быть 
+приостановлен. 
+2.2. 
+Режим отключения работы с заказами 
+В каких-то случаях по усмотрению ответственных лиц компании может быть принято 
+решение об отключении возможности работы с заказами через API (создание, изменение и проч.). 
+При включении такого режима все соответствующие операции Set* будут возвращать Result = 4 и 
+какое-то описание в ErrorMessage. Это описание также необходимо транслировать пользователю.  
+Ресурс-Медиа © 2024 
+8 
+Важно! В обоих случаях коды ошибок (3 и 4) 
+возвращаются сразу как результат работы операции. 
+Для операций Set* это означает, что их обработка не 
+выполняется и в очередь они не становятся, поэтому 
+дальнейшие попытки получать результаты этих 
+операций с использованием GetOperationResult 
+бессмысленны.  
+Ресурс-Медиа © 2024 
+9 
+3. Статусные поля результата вызова операции: Result и 
+ErrorMessage 
+Result 
+Содержит числовой код, характеризующий успешность выполнения операции. Ниже 
+приведены возможные значения и их описание. 
+Код 
+Описание 
+0 
+Отсутствие ошибки 
+1 
+Ошибка в процессе выполнения операции. Может быть как устранимой Пользователем, 
+так и неустранимой – всё зависит от текста сообщения. Устранимые ошибки возникают в 
+результате некорректно переданных в операцию данных: несуществующий договор, 
+несуществующий номер заказа, неразрешенная дата отгрузки и т.п. Неустранимые 
+ошибки возникают в процессе выполнения кода операции и не зависят от действий 
+Пользователя (дедлоки, синтаксические ошибки в нашем коде и т.п.). 
+2 
+Возможна только для операции GetOperationResult. Означает, что операция, 
+использующая очередь (а это все операции управления заказами), еще не обработалась.  
+3 
+Отказ в доступе текущему вызову данной операции (см. Подсистема управления 
+интервалами между вызовами одной и той же операции) 
+4 
+Включен режим запрета работы с заказами (см. Режим отключения работы с заказами) 
+Примечание. В поле PosResult в операции GetOperationResult возможны коды только 0 и 1. 
+ErrorMessage 
+В случае, если поле Result отлично от 0, содержит текст описания ошибки. 
+Ресурс-Медиа © 2024 
+10 
+4. Описание операций API 
+Внимание! В описании операций представлена 
+логическая структура параметров, которая в ряде 
+случаев может не в полной степени соответствовать 
+физической. Для получения реальной структуры 
+смотрите схему wsdl, которую можно прочитать по 
+адресу подключения к API (например, в браузере). 
+4.1. 
+GetCatalog  
+Получение данных по номенклатуре 
+Получает справочник групп номенклатур.  
+Входные параметры: 
+Нет 
+Выходные параметры: 
+GetCatalog_Resp – структура 
+ MaterialGroup_Tab – таблица со списком групп номенклатур 
+o MaterialGroup – код группы номенклатуры 
+o MaterialGroupParent – код родительской группы 
+o Name – наименование группы 
+ Result  
+ ErrorMessage 
+GetMaterialData 
+Получает основные данные о номенклатуре. На вход может подаваться один из трех 
+идентифицирующих параметров: MaterialGroup_Tab – будет выдан список номенклатуры, 
+входящей в переданные группы; MaterialID_Tab, VendorPart_Tab – будет выдана номенклатура, 
+найденная, соответственно, по кодам или по артикулам производителя. Если по какому-либо 
+Ресурс-Медиа © 2024 
+11 
+артикулу производителя найдется несколько номенклатур, будут выданы все найденные. Если не 
+заполнен ни один из этих параметров, на выходе будет получена вся доступная номенклатура. 
+Входные параметры: 
+MaterialID_Tab – таблица кодов номенклатур 
+ MaterialID – код номенклатуры 
+MaterialGroup_Tab – таблица кодов групп каталога 
+ MaterialGroup – код группы номенклатуры 
+VendorPart_Tab – таблица артикулов производителя 
+ VendorPart – артикул производителя 
+WithCharacteristics – управление выводом характеристик: выводить или нет. Необязательный 
+WithBarCodes – управление выводом штрих-кодов: выводить или нет. Необязательный 
+WithCertificates – управление выводом сертификатов: выводить или нет. Необязательный 
+WithImages – управление выводом изображений: выводить или нет. Необязательный 
+Выходные параметры: 
+GetMaterialData_Resp – структура 
+ MaterialData_Tab – таблица с данными по номенклатуре 
+o MaterialID – код номенклатуры  
+o PartNum – артикул в базе РМ 
+o PartNumCust – артикул в базе Пользователя. Если в базе РМ такая информация 
+отсутствует, то поле не выводится. 
+o MaterialText – наименование номенклатуры 
+o MaterialTextCust – наименование номенклатуры по данным Пользователя. Если в базе 
+РМ такая информация отсутствует, то поле не выводится. 
+o MaterialGroup – код группы номенклатуры 
+o Vendor – имя производителя 
+o VendorPart – артикул производителя 
+o UnitOfMeasurement – единица измерения 
+o Multiplicity – кратность количества, с которой продается номенклатура 
+o Weight – вес брутто 
+o Volume – объем 
+o Width – ширина 
+o Length – длина 
+o Height – высота 
+o VAT – НДС 
+o Kit – содержит признак того, что номенклатура является частью комплекта. Этот 
+признак имеет значение Истина только в том случае, если данная номенклатура не 
+Ресурс-Медиа © 2024 
+12 
+может быть продана отдельно. Но возможна ситуация, когда номенклатура с одной 
+стороны входит в комплект, а с другой – может быть продана отдельно. Условный 
+пример: есть комплектообразующая номенклатура А, с ней обязательно идут 
+комплектующие Б и В, но при этом комплектующая В имеет разрешение к 
+самостоятельной продаже. В этом случае расклад будет таким: для А поле Kit = Истина, 
+таблица KitParts содержит Б и В, для Б Kit = Истина, для В Kit = Ложь. 
+o WebDescription – текстовое описание, соответствующее передаваемому на портал B2B. 
+Может содержать дополнительную информацию и не является заменой наименованию. 
+Если описание отсутствует, поле не выводится.  
+o MaterialCharacteristics – таблица с характеристиками номенклатуры 
+ Name – название характеристики 
+ Value – значение характеристики 
+o BarCodes – таблица со штрих-кодами номенклатуры 
+ BarCode – код 
+ BarCodeType – тип штрих-кода 
+ UnitOfMeasurement – единица измерения, с которой связан штрих-код 
+o KitParts – таблица комплектующих; может присутствовать только в том случае, если 
+поле Kit = Истина и данная номенклатура является комплектообразующей 
+ PartID – MaterialID комплектующей 
+ Quantity – количество этой комплектующей, входящей в комплект 
+o Certificate – структура полей, описывающих сертификат; присутствует только в том 
+случае, если у номенклатуры есть сертификат. 
+ Beginning – начало действия; может быть типом дата или строка! 
+ Expiration – окончание действия  
+ Number – номер  
+ IssuedBy – орган, выдавший сертификат 
+o Images – таблица с адресами изображений; 
+ Image – интернет-адрес изображения 
+ Result  
+ ErrorMessage 
+4.2. 
+Получение данных для доставки 
+GetDeliveryAddresses 
+Получает адреса доставки, доступные для контрагента.  
+Ресурс-Медиа © 2024 
+13 
+Входные параметры 
+ClientID – код контрагента. Если не указан, то будет выдан список по всем доступным 
+контрагентам. 
+Выходные параметры 
+GetDeliveryAddresses_Resp – структура 
+ DeliveryAddressesInfo – таблица 
+o ClientID – код контрагента  
+o DeliveryAddressID – адрес доставки (идентификатор адреса) 
+o DeliveryAddress – адрес доставки 
+ Result  
+ ErrorMessage 
+GetDeliveryCities 
+Получает перечень городов, доступных для доставки. 
+Входные параметры: 
+Нет 
+Выходные параметры 
+GetDeliveryCities_Resp – структура 
+ DeliveryCitiesInfo – таблица 
+o Name – наименование города  
+o Region – наименование региона 
+o DeliveryMethod – способ доставки 
+o ClassificationCode – код адресного классификатора 
+ Result  
+ ErrorMessage 
+GetDeliveryTypes 
+Получает доступные способы доставки.  
+Входные параметры 
+ClientID – код контрагента. Если не указан, то будет выдан список по всем доступным 
+контрагентам. 
+Выходные параметры 
+GetDeliveryTypes_Resp – структура 
+Ресурс-Медиа © 2024 
+14 
+ DeliveryTypesInfo – таблица 
+o ClientID – код контрагента  
+o DeliveryType – тип доставки 
+ Result  
+ ErrorMessage 
+GetExcludedDates 
+Получает перечень дат, в которые РМ не производит отгрузку товара. Возвращаемые даты 
+ограничиваются интервалом, заданным во входных параметрах. 
+Входные параметры 
+Date_From – начальная дата интервала 
+Date_To – конечная дата интервала 
+Выходные параметры 
+GetExcludedDates_Resp – структура 
+ ExcludedDates – таблица дат 
+o ExcludedDate – дата 
+ Result  
+ ErrorMessage 
+4.3. 
+Получение данных по контрагентам 
+GetClientsAvail 
+Получает перечень контрагентов, доступных для вызывающего контрагента. 
+Входные параметры: 
+Нет 
+Выходные параметры 
+GetClientsAvail_Resp – структура  
+ ClientsInfo – доступные контрагенты для вызывающего контрагента, таблица 
+o ClientID – код контрагента 
+o ClientName – наименование контрагента 
+o INN – ИНН контрагента 
+o KPP – КПП контрагента 
+Ресурс-Медиа © 2024 
+15 
+o LegalAddress – юридический адрес контрагента 
+ Result  
+ ErrorMessage 
+GetContracts 
+Получает данные договоров, доступных для указанного контрагента. 
+Входные параметры 
+ClientID – код контрагента 
+Выходные параметры 
+GetContracts_Resp – структура 
+ ContractsInfo – таблица 
+o ClientID – код контрагента 
+o Supplier – поставщик 
+o Number – номер договора 
+o Date – дата договора 
+o Currency – валюта 
+o Delay – отсрочка по договору 
+o AdmissibleDebt – допустимая задолженность по договору 
+ Result  
+ ErrorMessage 
+GetWareHouses 
+Получает перечень складов компании, доступных для указанного контрагента 
+Входные параметры 
+ClientID – код контрагента. Если не указан, то будет выдан список по всем доступным 
+контрагентам. 
+Выходные параметры 
+GetWareHousesID_Resp – структура 
+ WareHousesInfo – таблица 
+o ClientID – код контрагента 
+o WareHouseID – код склада 
+o WareHouseName – наименование склада 
+ Result  
+ ErrorMessage 
+Ресурс-Медиа © 2024 
+16 
+4.4. 
+Получение остатков и цен 
+GetPrices 
+Получает цены и остатки товаров. Если не передан ни один из параметров MaterialID_Tab и 
+MaterialGroup_Tab, то запрос будет выполнен по всему каталогу. Номенклатурный состав в 
+результате работы операции может различаться в зависимости от того, запрошены ли остатки: если 
+да, то в результат попадут только те позиции, по которым есть остаток.  
+Входные параметры 
+WareHouseID – код склада 
+MaterialID_Tab – таблица кодов номенклатур 
+ 
+MaterialID – код номенклатуры 
+MaterialGroup_Tab – таблица кодов групп каталога 
+ 
+MaterialGroup – код номенклатуры 
+GetAvailableCount – управляет необходимостью получения свободных остатков 
+Выходные параметры 
+GetPrices_Resp – структура 
+ Material_Tab – таблица кодов и цен номенклатур 
+o MaterialID – код номенклатуры 
+o PartNum – артикул номенклатуры 
+o PartNumCust – артикул в базе Пользователя 
+o Price – цена (с НДС) для рублевых договоров 
+o PriceUSD – цена (с НДС) для валютных договоров 
+o AvailableCount – свободный остаток 
+ Result  
+ ErrorMessage 
+GetItemsAvail  
+Получает информацию об остатках товаров на складе РМ. Из входящих параметров 
+MaterialID_Tab и MaterialGroup_Tab передавать при вызове необходимо только один. При 
+одновременной передаче двух не пустых таблиц приоритет имеет MaterialID_Tab. Если не передан 
+ни один из этих параметров, то запрос будет выполнен по всему каталогу. 
+Возвращает таблицу с перечнем товаров и доступным количеством. 
+Входные параметры: 
+WareHouseID – код склада 
+Ресурс-Медиа © 2024 
+17 
+MaterialID_Tab – таблица кодов номенклатур 
+ MaterialID – код номенклатуры 
+MaterialGroup_Tab – таблица кодов групп номенклатур, полученных операцией GetCatalog 
+ MaterialGroup – код группы номенклатуры  
+Выходные параметры: 
+GetItemsAvail_Resp – структура 
+ Material_Tab – таблица со списком номенклатур и доступным количеством 
+o MaterialID – код номенклатуры 
+o PartNum – артикул номенклатуры 
+o PartNumCust – артикул в базе Пользователя 
+o AvailableCount – доступное количество 
+ Result  
+ ErrorMessage 
+4.5. 
+Получение данных по заказам 
+GetOrderHeader 
+Получает заголовок заказа(ов). 
+Входные параметры 
+DocumentNumber – номер заказа. Если параметр передан, то операция пытается найти документ с 
+указанным номером, а параметры: Dispatched, StartDate, EndDate – игнорируются. Если передано 
+значение Неопределено, то операция ищет все документы в соответствии с параметрами: Dispatched, 
+StartDate, EndDate. 
+Dispatched – если Истина, то возвращает только отгруженные заказы; Ложь или Неопределено – 
+только не отгруженные.  
+StartDate – дата начала выборки документов. Если не передана, то будет использоваться дата по 
+умолчанию (150 дней от текущей). 
+EndDate – дата окончания выборки документов. Если не передана, то используется текущая дата. 
+Выходные параметры 
+GetOrderHeader_Resp – структура 
+ OrderHeader – таблица, заголовок заказа 
+o ClientID – код контрагента 
+o ConsigneeID – код грузополучателя 
+o DocumentNumber – номер заказа 
+o OrderDate – дата заказа 
+o Status – статус заказа 
+o SuplyContract – номер договора 
+Ресурс-Медиа © 2024 
+18 
+o ShipmentDate – дата отгрузки 
+o WareHouseID – код склада 
+o DeliveryType – тип доставки  
+o DeliveryAddressID – адрес доставки (идентификатор адреса) 
+o PurchaseOrderNumber – номер заказа в учетной системе Пользователя, 
+соответствующий заказу в системе РМ 
+o Comment – комментарий к заказу. Может быть изменен как менеджером РМ, так и 
+Покупателем 
+o Sum – сумма заказа (с НДС) (по рублевому договору) 
+o SumUSD – сумма заказа (с НДС) (по валютному договору) 
+ Result  
+ ErrorMessage 
+GetOrderItems 
+Получает табличную часть заказа по его номеру.  
+Входные параметры 
+DocumentNumber – номер заказа 
+Выходные параметры 
+GetOrderItems_Resp – структура 
+ OrderItems – позиции заказа, таблица 
+o MaterialID – код номенклатуры 
+o PartNum – артикул номенклатуры 
+o PartNumCust – артикул в базе Пользователя 
+o Quantity – количество 
+o Price – цена (с НДС) 
+o Sum – сумма (с НДС) 
+o PriceUSD – цена (с НДС) в долларах (по валютному договору) 
+o SumUSD – сумма (с НДС) в долларах (по валютному договору) 
+ Result  
+ ErrorMessage 
+4.6. 
+Работа с заказами 
+Важно! Все операции данного раздела доступны только 
+для заказов, созданных через API. 
+Ресурс-Медиа © 2024 
+19 
+GetOperationResult 
+Получает результат выполнения операций Set* и DispatchOrder.  
+Входные параметры 
+OperationID – уникальный идентификатор операции 
+Выходные параметры 
+GetOperationResult_Resp – структура 
+ DocumentNumber – номер заказа 
+ OrderItems – таблица позиций заказа  
+o DocumentNumber – номер заказа (при получении результата метода SetFinalOrder это 
+поле будет содержать номер нового документа в системе РМ, который может не 
+совпадать с исходным в случае, если исходный заказ был разбит на несколько). 
+o PurchaseOrderNumber – номер заказа в системе Пользователя.  
+o MaterialID – код номенклатуры 
+o PartNum – артикул номенклатуры 
+o PartNumCust – артикул в базе Пользователя 
+o Quantity – зафиксированное в заказе количество 
+o Price – цена номенклатуры в заказе в рублях 
+o PriceUSD – цена номенклатуры в заказе в долларах 
+o Sum – сумма по номенклатуре в заказе в рублях 
+o SumUSD – сумма по номенклатуре в заказе в долларах 
+o PosResult – код результат обработки позиции. Возможны ситуации, когда в целом 
+операция считается выполненной без ошибок, но по конкретным позициям 
+зарегистрированы ошибки   
+o PosError – в случае ошибки (если PosResult = 1), содержит сообщение об ошибке по 
+данной позиции 
+ Result  
+ ErrorMessage 
+SetOrderCreate 
+Создает заказ пользователя. Алгоритм обработки запроса зависит от параметра Reserve. Если 
+он равен Истина, то из запрошенного количества в заказ попадет только та часть, которая имеется в 
+остатке. Например: Quantity = 5, доступный остаток = 3 – в заказ попадет 3. Если Reserve равен 
+Ложь, то заказ не будет резервировать, поэтому в него попадет все запрошенное количество. Если 
+необходимо создать заказ без товарной части, то таблицу с товарами можно не передавать. 
+Ресурс-Медиа © 2024 
+20 
+Входные параметры 
+OrderHeader – структура, заголовок заказа 
+ ClientID – код контрагента 
+ ConsigneeID – код грузополучателя. Доступные грузополучатели совпадают с доступными 
+контрагентами (операция GetClientsAvail). 
+ SuplyContract – номер договора 
+ ShipmentDate – дата отгрузки 
+ WareHouseID – код склада (обязателен к заполнению в этом методе) 
+ DeliveryType – тип доставки 
+ DeliveryAddressID – адрес доставки (идентификатор адреса) 
+ PurchaseOrderNumber – номер заказа в системе Пользователя. 
+ Comment – комментарий к заказу. 
+OrderItems – структура 
+ Item – таблица позиций заказа 
+o MaterialID – код номенклатуры 
+o Quantity – затребованное количество 
+Reserve – управляет резервированием заказа. Если значение не передано, считается Истина. 
+Выходные параметры 
+Response – структура  
+ OperationID – уникальный идентификатор операции 
+ Result  
+ ErrorMessage 
+SetOrderChange 
+Изменяет заказ. На вход передаются: структура полей заголовка заказа и таблица с позициями 
+заказа для изменения, т.е. только те позиции, которые Пользователь намерен изменить. Если 
+позиции с переданной номенклатурой не существует в заказе, то она в него добавляется. Если 
+позиция уже существует, то обновляется количество. Если передано количество «0», то позиция 
+удаляется из заказа. Для изменения только полей заголовка таблицу с номенклатурой можно не 
+передавать. 
+Входные параметры 
+DocumentNumber – номер изменяемого заказа в системе РМ 
+OrderHeader,  OrderItems,  Reserve – см. SetOrderCreate 
+Выходные параметры 
+Response – структура  
+Ресурс-Медиа © 2024 
+21 
+ OperationID – уникальный идентификатор операции 
+ Result  
+ ErrorMessage 
+SetDeleteOrder 
+Удаляет заказ. 
+Входные параметры 
+DocumentNumber – номер заказа 
+Выходные параметры 
+Response – структура  
+ OperationID – уникальный идентификатор операции 
+ Result  
+ ErrorMessage 
+SetSignOrder 
+«Подписывает» заказ. После его выполнения изменение заказа операциями API невозможно. 
+На вход передается номер заказа.  
+Входные параметры 
+DocumentNumber – номер заказа 
+OrderHeader,  OrderItems – см. SetOrderCreate  
+Важно! В отличие от SetOrderChange в данной операции 
+в таблицу OrderItems следует передавать ровно тот 
+состав товаров и их количества, какой вы хотите видеть 
+в конечном состоянии заказа. Т.е. если какие-то позиции, 
+имеющиеся в заказе к моменту подписания, не передать, 
+они будут удалены из заказа. При указании количества, 
+отличного от текущего в заказе, будет попытка привести 
+количество к запрошенному. При указании позиции, 
+отсутствующей в заказе, она будет, по возможности, 
+добавлена. Т.е. обработка таблицы аналогична операции 
+SetOrderCreate. 
+Ресурс-Медиа © 2024 
+22 
+Выходные параметры 
+Response – структура  
+ OperationID – уникальный идентификатор операции 
+ Result  
+ ErrorMessage 
+SetFinalOrder 
+Операция вызывается последней среди операций по модификации заказа и позволяет разбить 
+один заказ на несколько. Заказы, полученные в результате разбиения, являются 
+финализированными, поэтому их невозможно изменять с помощью API.  
+Предусмотрен упрощенный вариант вызова этого метода – без указания OrderItems. В таком 
+случае операция выполняется значительно быстрее, без модификации товарного состава заказа. 
+Если нет необходимости на данном этапе изменить заказ или разбить его на несколько, 
+рекомендуется использовать именно этот вариант. 
+Если же передается таблица OrderItems, то обработка происходит следующим образом. Все 
+переданные данные группируются по полю PurchaseOrderNumber. Если значений в этом поле будет 
+больше одного, то исходный заказ будет разбит на количество переданных различных значений. 
+Итоговый товарный состав всех получившихся заказов будет соответствовать содержащемуся в 
+таблице OrderItems. Таким образом, на этом последнем этапе можно изменить товарный состав без 
+предварительного использования операции SetOrderChange. 
+Входные параметры 
+DocumentNumber – номер заказа пользователя в базе РМ 
+OrderItems – структура 
+ Item – таблица позиций заказа 
+o MaterialID – код номенклатуры 
+o PurchaseOrderNumber – номер заказа в учетной системе Пользователя 
+o Quantity – затребованное количество 
+o Reserve – управляет резервированием финализируемого заказа. Если исходный заказ 
+разбивается на этом этапе на несколько, данный параметр позволяет изменять режим 
+резервирования для каждого нового заказа. 
+Выходные параметры 
+Response – структура  
+ OperationID – уникальный идентификатор операции 
+ Result  
+ ErrorMessage 
+Ресурс-Медиа © 2024 
+23 
+SetOrderMerge 
+Объединяет финализированные заказы. Заказы объединяются полными своими составами. 
+Входные параметры 
+OrderHeader – структура с параметрами объединенного заказа 
+ ClientID – код контрагента 
+ ConsigneeID – код грузополучателя 
+ SuplyContract – номер договора 
+ ShipmentDate – дата отгрузки 
+ WareHouseID – код склада 
+ DeliveryType – тип доставки 
+ DeliveryAddressID – адрес доставки (идентификатор адреса) 
+ PurchaseOrderNumber – номер заказа в учетной системе Пользователя, соответствующий 
+создаваемому объединенному заказу 
+ Comment – комментарий к заказу. 
+OrderNumbers – таблица с номерами объединяемых заказов 
+ OrderNumber – номер заказа в базе РМ 
+Выходные параметры 
+Response – структура  
+ OperationID – уникальный идентификатор операции 
+ Result  
+ ErrorMessage 
+DispatchOrder 
+Отправляет финализированный заказ на сборку. 
+Входные параметры 
+DocumentNumber – номер заказа пользователя в базе РМ 
+Выходные параметры 
+Response – структура  
+ OperationID – уникальный идентификатор операции 
+ Result  
+ ErrorMessage 
+Ресурс-Медиа © 2024 
+24 
+4.7. 
+Сервисные операции 
+Notification 
+Передает уведомления пользователю, которые РМ считает необходимым сообщить. Могут 
+быть как общие, так и персональные, однако внешних различий в них нет. Уведомления имеют срок 
+актуальности, после которого они перестают отправляться пользователю при вызове операции. В 
+течение этого срока они будут отправляться при каждом вызове операции, т.е. нет возможности 
+пометить их на стороне РМ как «прочитано». При передаче конкретной даты в соответствующий 
+параметр операции можно получить все уведомления, которые были актуальны на указанную дату 
+и до текущей. 
+Важно! Реализация вызова данной операции обязательна 
+для всех пользователей, поскольку уведомления, не 
+предполагающие диалог в переписке, будут доводиться до 
+сведения пользователей только с помощью нее (например, 
+о предстоящем обновлении версии API, о планирующейся 
+приостановке работы API и т.п.). Электронная почта в 
+этих случаях использоваться не будет. 
+Рекомендуемая методика использования данной операции. 
+ Организовать вызов несколько раз в сутки. 
+ При получении уведомления обеспечить передачу его содержимого ответственным 
+лицам. 
+ Т.к. уведомление может содержать файл вложения, сохранить его. 
+ Поскольку уведомление имеет уникальный идентификатор, при необходимости 
+реализовать в своей учетной системе механизм «прочитано». 
+Входные параметры 
+FromDate – дата, с которой необходимо получить публиковавшиеся уведомления. Если не указана, 
+ищутся уведомления, актуальные на момент вызова.  
+Выходные параметры 
+Notification_Resp – структура  
+ Notification – таблица уведомлений 
+o NotificationID – уникальный идентификатор уведомления 
+o Text – текст уведомления 
+o Attachment – файл вложения, закодированный в формате base64Binary 
+o AttachmentName – имя файла вложения 
+ Result  
+ ErrorMessage 
+Ресурс-Медиа © 2024 
+25 
+ 
+26 
+Ресурс-Медиа © 2024 
+Отличия от предыдущих версий 
+ 
+Описание Раздел документации 
+Отличия от версии 7.1 
+Автоматическая отмена резервов через определенный 
+промежуток времени. 
+Общее описание методики 
+работы с заказом  
+В структуру OrderHeader добавлено поле Comment 
+Описание методов, 
+использующих структуру 
+OrderHeader (например, 
+SetOrderCreate) 
+Отличия от версии 7.2 
+Реализована подсистема ограничения вызовов операций Ограничения вызовов 
+операций API 
+В структуру, возвращаемую GetOperationResult 
+добавлены поля: Price, Sum, PriceUSD, SumUSD GetOperationResult 
+В структуру, возвращаемую GetMaterialData добавлены 
+поля: Kit, WebDescription GetMaterialData 
+Из OrderItems операции SetFinalOrder удалено поле 
+MaterialText SetFinalOrder 
+Операции GetOrderHeader и GetOrderItems возвращают 
+заказы, созданные не только через API. Изменений нет 
+Отличия от версии 7.3 
+В структуру, возвращаемую GetMaterialData, добавлены:  
+ поля: Width, Length, Height, VAT;  
+ таблицы: KitParts, Images;  
+ структура Certificate. 
+Поле WebDescription может отсутствовать, если в нем 
+нет данных 
+Во входящие параметры операции добавлены: 
+WithCertificates, WithImages 
+GetMaterialData 
+Добавлена операция Notification – обязательная к 
+реализации! Notification 
+Отличия от версии 7.4 
+В ответе операции GetMaterialData добавлено поле 
+Multiplicity 
+GetMaterialData 
+Ресурс-Медиа © 2024 
+27 
+Ресурс-Медиа © 2024 
+28 

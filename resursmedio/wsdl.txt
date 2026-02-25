@@ -1,0 +1,1551 @@
+This XML file does not appear to have any style information associated with it. The document tree is shown below.
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap12bind="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:soapbind="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://resurs-media.ru/api" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://resurs-media.ru/api" name="WSAPI" targetNamespace="http://resurs-media.ru/api">
+<types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xs1="http://resurs-media.ru/api" targetNamespace="http://resurs-media.ru/api" attributeFormDefault="unqualified" elementFormDefault="qualified">
+<xs:simpleType name="MaterialID">
+<xs:restriction base="xs:string">
+<xs:maxLength value="35"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="MaterialGroup">
+<xs:restriction base="xs:string">
+<xs:maxLength value="18"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="Count">
+<xs:restriction base="xs:integer">
+<xs:totalDigits value="9"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="QueryResult">
+<xs:restriction base="xs:integer">
+<xs:minInclusive value="0"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="UnitOfMeasurement">
+<xs:restriction base="xs:string">
+<xs:maxLength value="25"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="CharName">
+<xs:restriction base="xs:string">
+<xs:maxLength value="40"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="DocumentNumber">
+<xs:restriction base="xs:string">
+<xs:maxLength value="10"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="MaterialText">
+<xs:restriction base="xs:string">
+<xs:maxLength value="40"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="ClientID">
+<xs:restriction base="xs:integer">
+<xs:totalDigits value="8"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="Currency">
+<xs:restriction base="xs:string">
+<xs:minLength value="3"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="SuplyContractNumber">
+<xs:restriction base="xs:string">
+<xs:minLength value="1"/>
+<xs:maxLength value="100"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="WareHouseID">
+<xs:restriction base="xs:string">
+<xs:maxLength value="5"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="DeliveryAddressID">
+<xs:restriction base="xs:string">
+<xs:maxLength value="9"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="VendorPart">
+<xs:restriction base="xs:string">
+<xs:maxLength value="35"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:complexType name="ItemTableType">
+<xs:sequence>
+<xs:element name="MaterialID" type="tns:MaterialID"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="ItemTableType_Resp">
+<xs:complexContent>
+<xs:extension base="tns:ItemTableType">
+<xs:sequence>
+<xs:element name="PartNum" type="xs:string" nillable="true"/>
+<xs:element name="PartNumCust" type="xs:string" nillable="true" minOccurs="0"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="ItemTableTypeOrder_Resp">
+<xs:complexContent>
+<xs:extension base="tns:ItemTableType_Resp">
+<xs:sequence>
+<xs:element name="Quantity" type="tns:Count"/>
+<xs:element name="Price" type="xs:float"/>
+<xs:element name="Sum" type="xs:float"/>
+<xs:element name="PriceUSD" type="xs:float"/>
+<xs:element name="SumUSD" type="xs:float"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="Response_BaseType">
+<xs:sequence>
+<xs:element name="Result" type="tns:QueryResult"/>
+<xs:element name="ErrorMessage" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="MaterialID_Tab">
+<xs:sequence>
+<xs:element name="Item" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="tns:ItemTableType"/>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="MaterialGroup_Tab">
+<xs:sequence>
+<xs:element name="Item" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="MaterialGroup" type="tns:MaterialGroup"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="VendorPart_Tab">
+<xs:sequence>
+<xs:element name="Item" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="VendorPart" type="tns:MaterialID"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="OrderItems">
+<xs:sequence>
+<xs:element name="Item" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="tns:ItemTableType">
+<xs:sequence>
+<xs:element name="Quantity" type="tns:Count"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="SetFinalOrder_Req_OrderItems">
+<xs:sequence>
+<xs:element name="Item" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="tns:ItemTableType">
+<xs:sequence>
+<xs:element name="PurchaseOrderNumber" type="xs:string" nillable="true"/>
+<xs:element name="Quantity" type="tns:Count"/>
+<xs:element name="Reserve" type="xs:boolean" minOccurs="0"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="GetItemsAvail_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="Material_Tab" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="tns:ItemTableType_Resp">
+<xs:sequence>
+<xs:element name="AvailableCount" type="xs:string"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetMaterialData_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="MaterialData_Tab">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="Item" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="tns:ItemTableType_Resp">
+<xs:sequence>
+<xs:element name="MaterialText" type="xs:string" nillable="true"/>
+<xs:element name="MaterialTextCust" type="xs:string" minOccurs="0"/>
+<xs:element name="MaterialGroup" type="tns:MaterialGroup" nillable="true"/>
+<xs:element name="Vendor" type="xs:string" nillable="true"/>
+<xs:element name="VendorPart" type="xs:string" nillable="true"/>
+<xs:element name="UnitOfMeasurement" type="tns:UnitOfMeasurement" nillable="true"/>
+<xs:element name="Multiplicity" type="tns:Count" minOccurs="0"/>
+<xs:element name="Weight" type="xs:double" nillable="true"/>
+<xs:element name="Volume" type="xs:double" nillable="true"/>
+<xs:element name="Width" type="xs:float"/>
+<xs:element name="Length" type="xs:float"/>
+<xs:element name="Height" type="xs:float"/>
+<xs:element name="Kit" type="xs:boolean"/>
+<xs:element name="VAT" type="xs:string"/>
+<xs:element name="WebDescription" type="xs:string" minOccurs="0"/>
+<xs:element name="KitParts" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="PartID" type="tns:MaterialID"/>
+<xs:element name="Quantity" type="tns:Count"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="MaterialCharacteristics" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="Name" type="xs:string"/>
+<xs:element name="Value" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="BarCodes" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="BarCode" type="xs:string"/>
+<xs:element name="BarCodeType" type="xs:string"/>
+<xs:element name="UnitOfMeasurement" type="tns:UnitOfMeasurement"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="Certificate" minOccurs="0">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="Beginning" nillable="true">
+<xs:simpleType>
+<xs:union memberTypes="xs:string xs:date"/>
+</xs:simpleType>
+</xs:element>
+<xs:element name="Expiration" type="xs:date" nillable="true"/>
+<xs:element name="Number" type="xs:string" nillable="true"/>
+<xs:element name="IssuedBy" type="xs:string" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="Images" minOccurs="0">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="Image" type="xs:string" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetExcludedDates_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="ExcludedDates">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="ExcludedDate" type="xs:date" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetOrderItems_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="OrderItems">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="Item" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="tns:ItemTableTypeOrder_Resp"/>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="Response">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="OperationID" type="xs:string"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetOperationResult_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="DocumentNumber" type="tns:DocumentNumber" minOccurs="0"/>
+<xs:element name="OrderItems" minOccurs="0">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="Item" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="tns:ItemTableTypeOrder_Resp">
+<xs:sequence>
+<xs:element name="DocumentNumber" type="tns:DocumentNumber"/>
+<xs:element name="PurchaseOrderNumber" type="xs:string" nillable="true"/>
+<xs:element name="PosResult" type="tns:QueryResult"/>
+<xs:element name="PosError" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="OrderHeader">
+<xs:sequence>
+<xs:element name="ClientID" type="tns:ClientID"/>
+<xs:element name="ConsigneeID" type="tns:ClientID" nillable="true" minOccurs="0"/>
+<xs:element name="SuplyContract" type="tns:SuplyContractNumber" nillable="true" minOccurs="0"/>
+<xs:element name="ShipmentDate" type="xs:date" nillable="true" minOccurs="0"/>
+<xs:element name="WareHouseID" type="tns:WareHouseID" nillable="true" minOccurs="0"/>
+<xs:element name="DeliveryType" type="xs:string" nillable="true" minOccurs="0"/>
+<xs:element name="DeliveryAddressID" type="tns:DeliveryAddressID" nillable="true" minOccurs="0"/>
+<xs:element name="PurchaseOrderNumber" type="xs:string" nillable="true" minOccurs="0"/>
+<xs:element name="Comment" type="xs:string" nillable="true" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="GetClientsAvail_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="ClientsInfo" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="ClientID" type="tns:ClientID"/>
+<xs:element name="ClientName">
+<xs:simpleType>
+<xs:restriction base="xs:string">
+<xs:maxLength value="200"/>
+</xs:restriction>
+</xs:simpleType>
+</xs:element>
+<xs:element name="INN" nillable="true">
+<xs:simpleType>
+<xs:restriction base="xs:string">
+<xs:maxLength value="12"/>
+</xs:restriction>
+</xs:simpleType>
+</xs:element>
+<xs:element name="KPP" nillable="true">
+<xs:simpleType>
+<xs:restriction base="xs:string">
+<xs:maxLength value="9"/>
+</xs:restriction>
+</xs:simpleType>
+</xs:element>
+<xs:element name="LegalAddress" nillable="true">
+<xs:simpleType>
+<xs:restriction base="xs:string">
+<xs:maxLength value="150"/>
+</xs:restriction>
+</xs:simpleType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetContracts_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="ContractsInfo" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="ClientID" type="tns:ClientID"/>
+<xs:element name="Supplier" type="xs:string"/>
+<xs:element name="Number" type="tns:SuplyContractNumber"/>
+<xs:element name="Date" type="xs:date"/>
+<xs:element name="Currency" type="tns:Currency"/>
+<xs:element name="Delay" type="xs:integer"/>
+<xs:element name="AdmissibleDebt" type="xs:float"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetWareHousesID_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="WareHousesInfo" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="ClientID" type="tns:ClientID"/>
+<xs:element name="WareHouseID" type="tns:WareHouseID"/>
+<xs:element name="WareHouseName" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetDeliveryTypes_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="DeliveryTypesInfo" nillable="true" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="ClientID" type="tns:ClientID"/>
+<xs:element name="DeliveryType" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetDeliveryAddresses_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="DeliveryAddressesInfo" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="ClientID" type="tns:ClientID"/>
+<xs:element name="DeliveryAddressID" type="tns:DeliveryAddressID"/>
+<xs:element name="DeliveryAddress" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetDeliveryCities_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="DeliveryCitiesInfo" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="Name" type="xs:string"/>
+<xs:element name="Region" type="xs:string"/>
+<xs:element name="DeliveryMethod" type="xs:string"/>
+<xs:element name="ClassificationCode">
+<xs:simpleType>
+<xs:restriction base="xs:nonNegativeInteger">
+<xs:totalDigits value="25"/>
+</xs:restriction>
+</xs:simpleType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetOrderHeader_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="OrderHeader" nillable="true" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="tns:OrderHeader">
+<xs:sequence>
+<xs:element name="DocumentNumber" type="tns:DocumentNumber"/>
+<xs:element name="OrderDate" type="xs:date"/>
+<xs:element name="Status" type="xs:string" minOccurs="0"/>
+<xs:element name="Sum" type="xs:float"/>
+<xs:element name="SumUSD" type="xs:float"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetPrices_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="Material_Tab" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:complexContent>
+<xs:extension base="tns:ItemTableType_Resp">
+<xs:sequence>
+<xs:element name="Price" type="xs:float"/>
+<xs:element name="PriceUSD" type="xs:float"/>
+<xs:element name="AvailableCount" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="GetCatalog_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="MaterialGroup_Tab" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="MaterialGroup" type="tns:MaterialGroup"/>
+<xs:element name="MaterialGroupParent" type="tns:MaterialGroup"/>
+<xs:element name="Name" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:complexType name="OrderNumbers">
+<xs:sequence>
+<xs:element name="OrderNumber" type="tns:DocumentNumber" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="Notification_Resp">
+<xs:complexContent>
+<xs:extension base="tns:Response_BaseType">
+<xs:sequence>
+<xs:element name="Notification" minOccurs="0" maxOccurs="unbounded">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="Text" type="xs:string"/>
+<xs:element name="Attachment" type="xs:base64Binary" minOccurs="0"/>
+<xs:element name="AttachmentName" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+<xs:attribute name="NotificationID" type="xs:string" use="required"/>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:extension>
+</xs:complexContent>
+</xs:complexType>
+<xs:element name="GetCatalog">
+<xs:complexType>
+<xs:sequence/>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetCatalogResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetCatalog_Resp"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetClientsAvail">
+<xs:complexType>
+<xs:sequence/>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetClientsAvailResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetClientsAvail_Resp" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetContracts">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="ClientID" type="tns:ClientID" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetContractsResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetContracts_Resp" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetDeliveryAddresses">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="ClientID" type="tns:ClientID" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetDeliveryAddressesResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetDeliveryAddresses_Resp"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetDeliveryCities">
+<xs:complexType>
+<xs:sequence/>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetDeliveryCitiesResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetDeliveryCities_Resp"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetDeliveryTypes">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="ClientID" type="tns:ClientID" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetDeliveryTypesResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetDeliveryTypes_Resp" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetExcludedDates">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="Date_From" type="xs:date"/>
+<xs:element name="Date_To" type="xs:date"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetExcludedDatesResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetExcludedDates_Resp"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetItemsAvail">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="WareHouseID" type="tns:WareHouseID"/>
+<xs:element name="MaterialID_Tab" type="tns:MaterialID_Tab" nillable="true"/>
+<xs:element name="MaterialGroup_Tab" type="tns:MaterialGroup_Tab" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetItemsAvailResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetItemsAvail_Resp"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetMaterialData">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="MaterialID_Tab" type="tns:MaterialID_Tab" nillable="true"/>
+<xs:element name="MaterialGroup_Tab" type="tns:MaterialGroup_Tab" nillable="true"/>
+<xs:element name="VendorPart_Tab" type="tns:VendorPart_Tab" nillable="true"/>
+<xs:element name="WithCharacteristics" type="xs:boolean" nillable="true"/>
+<xs:element name="WithBarCodes" type="xs:boolean" nillable="true"/>
+<xs:element name="WithCertificates" type="xs:boolean" nillable="true"/>
+<xs:element name="WithImages" type="xs:boolean" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetMaterialDataResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetMaterialData_Resp"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetOperationResult">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="OperationID" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetOperationResultResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetOperationResult_Resp"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetOrderHeader">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="DocumentNumber" type="tns:DocumentNumber" nillable="true"/>
+<xs:element name="Dispatched" type="xs:boolean" nillable="true"/>
+<xs:element name="StartDate" type="xs:date" nillable="true"/>
+<xs:element name="EndDate" type="xs:date" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetOrderHeaderResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetOrderHeader_Resp"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetOrderItems">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="DocumentNumber" type="tns:DocumentNumber"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetOrderItemsResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetOrderItems_Resp"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetPrices">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="WareHouseID" type="tns:WareHouseID"/>
+<xs:element name="MaterialID_Tab" type="tns:MaterialID_Tab" nillable="true"/>
+<xs:element name="MaterialGroup_Tab" type="tns:MaterialGroup_Tab" nillable="true"/>
+<xs:element name="GetAvailableCount" type="xs:boolean" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetPricesResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetPrices_Resp"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetWareHouses">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="ClientID" type="tns:ClientID" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="GetWareHousesResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:GetWareHousesID_Resp" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetDeleteOrder">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="DocumentNumber" type="tns:DocumentNumber"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetDeleteOrderResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:Response"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetFinalOrder">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="DocumentNumber" type="tns:DocumentNumber"/>
+<xs:element name="OrderItems" type="tns:SetFinalOrder_Req_OrderItems" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetFinalOrderResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:Response"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetOrderChange">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="DocumentNumber" type="tns:DocumentNumber"/>
+<xs:element name="OrderHeader" type="tns:OrderHeader" nillable="true"/>
+<xs:element name="OrderItems" type="tns:OrderItems" nillable="true"/>
+<xs:element name="Reserve" type="xs:boolean" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetOrderChangeResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:Response"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetOrderCreate">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="OrderHeader" type="tns:OrderHeader"/>
+<xs:element name="OrderItems" type="tns:OrderItems"/>
+<xs:element name="Reserve" type="xs:boolean" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetOrderCreateResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:Response"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetOrderMerge">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="OrderHeader" type="tns:OrderHeader"/>
+<xs:element name="OrderNumbers" type="tns:OrderNumbers"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetOrderMergeResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:Response"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetSignOrder">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="DocumentNumber" type="tns:DocumentNumber"/>
+<xs:element name="OrderHeader" type="tns:OrderHeader"/>
+<xs:element name="OrderItems" type="tns:OrderItems"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="SetSignOrderResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:Response"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="DispatchOrder">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="DocumentNumber" type="tns:DocumentNumber"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="DispatchOrderResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:Response"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="Notification">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="FromDate" type="xs:date" nillable="true"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="NotificationResponse">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="return" type="tns:Notification_Resp"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:schema>
+</types>
+<message name="GetCatalogRequestMessage">
+<part name="parameters" element="tns:GetCatalog"/>
+</message>
+<message name="GetCatalogResponseMessage">
+<part name="parameters" element="tns:GetCatalogResponse"/>
+</message>
+<message name="GetClientsAvailRequestMessage">
+<part name="parameters" element="tns:GetClientsAvail"/>
+</message>
+<message name="GetClientsAvailResponseMessage">
+<part name="parameters" element="tns:GetClientsAvailResponse"/>
+</message>
+<message name="GetContractsRequestMessage">
+<part name="parameters" element="tns:GetContracts"/>
+</message>
+<message name="GetContractsResponseMessage">
+<part name="parameters" element="tns:GetContractsResponse"/>
+</message>
+<message name="GetDeliveryAddressesRequestMessage">
+<part name="parameters" element="tns:GetDeliveryAddresses"/>
+</message>
+<message name="GetDeliveryAddressesResponseMessage">
+<part name="parameters" element="tns:GetDeliveryAddressesResponse"/>
+</message>
+<message name="GetDeliveryCitiesRequestMessage">
+<part name="parameters" element="tns:GetDeliveryCities"/>
+</message>
+<message name="GetDeliveryCitiesResponseMessage">
+<part name="parameters" element="tns:GetDeliveryCitiesResponse"/>
+</message>
+<message name="GetDeliveryTypesRequestMessage">
+<part name="parameters" element="tns:GetDeliveryTypes"/>
+</message>
+<message name="GetDeliveryTypesResponseMessage">
+<part name="parameters" element="tns:GetDeliveryTypesResponse"/>
+</message>
+<message name="GetExcludedDatesRequestMessage">
+<part name="parameters" element="tns:GetExcludedDates"/>
+</message>
+<message name="GetExcludedDatesResponseMessage">
+<part name="parameters" element="tns:GetExcludedDatesResponse"/>
+</message>
+<message name="GetItemsAvailRequestMessage">
+<part name="parameters" element="tns:GetItemsAvail"/>
+</message>
+<message name="GetItemsAvailResponseMessage">
+<part name="parameters" element="tns:GetItemsAvailResponse"/>
+</message>
+<message name="GetMaterialDataRequestMessage">
+<part name="parameters" element="tns:GetMaterialData"/>
+</message>
+<message name="GetMaterialDataResponseMessage">
+<part name="parameters" element="tns:GetMaterialDataResponse"/>
+</message>
+<message name="GetOperationResultRequestMessage">
+<part name="parameters" element="tns:GetOperationResult"/>
+</message>
+<message name="GetOperationResultResponseMessage">
+<part name="parameters" element="tns:GetOperationResultResponse"/>
+</message>
+<message name="GetOrderHeaderRequestMessage">
+<part name="parameters" element="tns:GetOrderHeader"/>
+</message>
+<message name="GetOrderHeaderResponseMessage">
+<part name="parameters" element="tns:GetOrderHeaderResponse"/>
+</message>
+<message name="GetOrderItemsRequestMessage">
+<part name="parameters" element="tns:GetOrderItems"/>
+</message>
+<message name="GetOrderItemsResponseMessage">
+<part name="parameters" element="tns:GetOrderItemsResponse"/>
+</message>
+<message name="GetPricesRequestMessage">
+<part name="parameters" element="tns:GetPrices"/>
+</message>
+<message name="GetPricesResponseMessage">
+<part name="parameters" element="tns:GetPricesResponse"/>
+</message>
+<message name="GetWareHousesRequestMessage">
+<part name="parameters" element="tns:GetWareHouses"/>
+</message>
+<message name="GetWareHousesResponseMessage">
+<part name="parameters" element="tns:GetWareHousesResponse"/>
+</message>
+<message name="SetDeleteOrderRequestMessage">
+<part name="parameters" element="tns:SetDeleteOrder"/>
+</message>
+<message name="SetDeleteOrderResponseMessage">
+<part name="parameters" element="tns:SetDeleteOrderResponse"/>
+</message>
+<message name="SetFinalOrderRequestMessage">
+<part name="parameters" element="tns:SetFinalOrder"/>
+</message>
+<message name="SetFinalOrderResponseMessage">
+<part name="parameters" element="tns:SetFinalOrderResponse"/>
+</message>
+<message name="SetOrderChangeRequestMessage">
+<part name="parameters" element="tns:SetOrderChange"/>
+</message>
+<message name="SetOrderChangeResponseMessage">
+<part name="parameters" element="tns:SetOrderChangeResponse"/>
+</message>
+<message name="SetOrderCreateRequestMessage">
+<part name="parameters" element="tns:SetOrderCreate"/>
+</message>
+<message name="SetOrderCreateResponseMessage">
+<part name="parameters" element="tns:SetOrderCreateResponse"/>
+</message>
+<message name="SetOrderMergeRequestMessage">
+<part name="parameters" element="tns:SetOrderMerge"/>
+</message>
+<message name="SetOrderMergeResponseMessage">
+<part name="parameters" element="tns:SetOrderMergeResponse"/>
+</message>
+<message name="SetSignOrderRequestMessage">
+<part name="parameters" element="tns:SetSignOrder"/>
+</message>
+<message name="SetSignOrderResponseMessage">
+<part name="parameters" element="tns:SetSignOrderResponse"/>
+</message>
+<message name="DispatchOrderRequestMessage">
+<part name="parameters" element="tns:DispatchOrder"/>
+</message>
+<message name="DispatchOrderResponseMessage">
+<part name="parameters" element="tns:DispatchOrderResponse"/>
+</message>
+<message name="NotificationRequestMessage">
+<part name="parameters" element="tns:Notification"/>
+</message>
+<message name="NotificationResponseMessage">
+<part name="parameters" element="tns:NotificationResponse"/>
+</message>
+<portType name="WSAPIPortType">
+<operation name="GetCatalog">
+<input message="tns:GetCatalogRequestMessage"/>
+<output message="tns:GetCatalogResponseMessage"/>
+</operation>
+<operation name="GetClientsAvail">
+<input message="tns:GetClientsAvailRequestMessage"/>
+<output message="tns:GetClientsAvailResponseMessage"/>
+</operation>
+<operation name="GetContracts">
+<input message="tns:GetContractsRequestMessage"/>
+<output message="tns:GetContractsResponseMessage"/>
+</operation>
+<operation name="GetDeliveryAddresses">
+<input message="tns:GetDeliveryAddressesRequestMessage"/>
+<output message="tns:GetDeliveryAddressesResponseMessage"/>
+</operation>
+<operation name="GetDeliveryCities">
+<input message="tns:GetDeliveryCitiesRequestMessage"/>
+<output message="tns:GetDeliveryCitiesResponseMessage"/>
+</operation>
+<operation name="GetDeliveryTypes">
+<input message="tns:GetDeliveryTypesRequestMessage"/>
+<output message="tns:GetDeliveryTypesResponseMessage"/>
+</operation>
+<operation name="GetExcludedDates">
+<input message="tns:GetExcludedDatesRequestMessage"/>
+<output message="tns:GetExcludedDatesResponseMessage"/>
+</operation>
+<operation name="GetItemsAvail">
+<input message="tns:GetItemsAvailRequestMessage"/>
+<output message="tns:GetItemsAvailResponseMessage"/>
+</operation>
+<operation name="GetMaterialData">
+<input message="tns:GetMaterialDataRequestMessage"/>
+<output message="tns:GetMaterialDataResponseMessage"/>
+</operation>
+<operation name="GetOperationResult">
+<input message="tns:GetOperationResultRequestMessage"/>
+<output message="tns:GetOperationResultResponseMessage"/>
+</operation>
+<operation name="GetOrderHeader">
+<input message="tns:GetOrderHeaderRequestMessage"/>
+<output message="tns:GetOrderHeaderResponseMessage"/>
+</operation>
+<operation name="GetOrderItems">
+<input message="tns:GetOrderItemsRequestMessage"/>
+<output message="tns:GetOrderItemsResponseMessage"/>
+</operation>
+<operation name="GetPrices">
+<input message="tns:GetPricesRequestMessage"/>
+<output message="tns:GetPricesResponseMessage"/>
+</operation>
+<operation name="GetWareHouses">
+<input message="tns:GetWareHousesRequestMessage"/>
+<output message="tns:GetWareHousesResponseMessage"/>
+</operation>
+<operation name="SetDeleteOrder">
+<input message="tns:SetDeleteOrderRequestMessage"/>
+<output message="tns:SetDeleteOrderResponseMessage"/>
+</operation>
+<operation name="SetFinalOrder">
+<input message="tns:SetFinalOrderRequestMessage"/>
+<output message="tns:SetFinalOrderResponseMessage"/>
+</operation>
+<operation name="SetOrderChange">
+<input message="tns:SetOrderChangeRequestMessage"/>
+<output message="tns:SetOrderChangeResponseMessage"/>
+</operation>
+<operation name="SetOrderCreate">
+<input message="tns:SetOrderCreateRequestMessage"/>
+<output message="tns:SetOrderCreateResponseMessage"/>
+</operation>
+<operation name="SetOrderMerge">
+<input message="tns:SetOrderMergeRequestMessage"/>
+<output message="tns:SetOrderMergeResponseMessage"/>
+</operation>
+<operation name="SetSignOrder">
+<input message="tns:SetSignOrderRequestMessage"/>
+<output message="tns:SetSignOrderResponseMessage"/>
+</operation>
+<operation name="DispatchOrder">
+<input message="tns:DispatchOrderRequestMessage"/>
+<output message="tns:DispatchOrderResponseMessage"/>
+</operation>
+<operation name="Notification">
+<input message="tns:NotificationRequestMessage"/>
+<output message="tns:NotificationResponseMessage"/>
+</operation>
+</portType>
+<binding name="WSAPISoapBinding" type="tns:WSAPIPortType">
+<soapbind:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+<operation name="GetCatalog">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetCatalog"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetClientsAvail">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetClientsAvail"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetContracts">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetContracts"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetDeliveryAddresses">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetDeliveryAddresses"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetDeliveryCities">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetDeliveryCities"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetDeliveryTypes">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetDeliveryTypes"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetExcludedDates">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetExcludedDates"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetItemsAvail">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetItemsAvail"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetMaterialData">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetMaterialData"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetOperationResult">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetOperationResult"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetOrderHeader">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetOrderHeader"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetOrderItems">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetOrderItems"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetPrices">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetPrices"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetWareHouses">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetWareHouses"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetDeleteOrder">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetDeleteOrder"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetFinalOrder">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetFinalOrder"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetOrderChange">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetOrderChange"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetOrderCreate">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetOrderCreate"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetOrderMerge">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetOrderMerge"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetSignOrder">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetSignOrder"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="DispatchOrder">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:DispatchOrder"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+<operation name="Notification">
+<soapbind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:Notification"/>
+<input>
+<soapbind:body use="literal"/>
+</input>
+<output>
+<soapbind:body use="literal"/>
+</output>
+</operation>
+</binding>
+<binding name="WSAPISoap12Binding" type="tns:WSAPIPortType">
+<soap12bind:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+<operation name="GetCatalog">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetCatalog"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetClientsAvail">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetClientsAvail"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetContracts">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetContracts"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetDeliveryAddresses">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetDeliveryAddresses"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetDeliveryCities">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetDeliveryCities"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetDeliveryTypes">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetDeliveryTypes"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetExcludedDates">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetExcludedDates"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetItemsAvail">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetItemsAvail"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetMaterialData">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetMaterialData"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetOperationResult">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetOperationResult"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetOrderHeader">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetOrderHeader"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetOrderItems">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetOrderItems"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetPrices">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetPrices"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="GetWareHouses">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:GetWareHouses"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetDeleteOrder">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetDeleteOrder"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetFinalOrder">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetFinalOrder"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetOrderChange">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetOrderChange"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetOrderCreate">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetOrderCreate"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetOrderMerge">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetOrderMerge"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="SetSignOrder">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:SetSignOrder"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="DispatchOrder">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:DispatchOrder"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+<operation name="Notification">
+<soap12bind:operation style="document" soapAction="http://resurs-media.ru/api#WSAPI:Notification"/>
+<input>
+<soap12bind:body use="literal"/>
+</input>
+<output>
+<soap12bind:body use="literal"/>
+</output>
+</operation>
+</binding>
+<service name="WSAPI">
+<port name="WSAPISoap" binding="tns:WSAPISoapBinding">
+<documentation>
+<wsi:Claim xmlns:wsi="http://ws-i.org/schemas/conformanceClaim/" conformsTo="http://ws-i.org/profiles/basic/1.1"/>
+</documentation>
+<soapbind:address location="https://testapi.resurs-media.ru/test9/ws/WSAPI"/>
+</port>
+<port name="WSAPISoap12" binding="tns:WSAPISoap12Binding">
+<soap12bind:address location="https://testapi.resurs-media.ru/test9/ws/WSAPI"/>
+</port>
+</service>
+</definitions>

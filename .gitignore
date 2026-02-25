@@ -1,0 +1,31 @@
+# Учетные записи, ключи и сектерты
+.env
+
+# Логи
+logs/
+*.log
+update_distributors.log
+
+# Временные файлы Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Виртуальное окружение
+venv/
+env/
+.venv/
+
+# Дампы и большие CSV файлы
+*.csv
+all_data.csv
+vvp_products_dump.csv
+
+# Загрузки
+static/uploads/
+
+# IDE
+.idea/
+.vscode/
+*.swp

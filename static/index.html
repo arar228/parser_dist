@@ -1,0 +1,2212 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Поиск по партномеру</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Open Sans', sans-serif !important;
+    }
+    body {
+      font-family: 'Open Sans', sans-serif;
+      margin: 0;
+      background: #f6f8fa;
+      overflow-x: hidden;
+    }
+    .container {
+      width: 100vw;
+      max-width: none;
+      margin: 0;
+      padding: 24px 2vw 24px 2vw;
+      background: #fff;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    .table-wrapper {
+      width: auto;
+      min-width: 0;
+      max-width: 100vw;
+      overflow-x: auto;
+      margin-top: 16px;
+      border-radius: 0;
+      box-shadow: none;
+      background: #fff;
+      position: relative;
+      padding-left: 0;
+    }
+    h2 {
+      margin-top: 0;
+      font-weight: 600;
+      color: #222;
+      letter-spacing: 0.5px;
+    }
+    label {
+      font-size: 1.08em;
+      color: #333;
+      font-weight: 500;
+    }
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      font-size: 1.08em;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #d0d7de;
+      margin-top: 6px;
+      margin-bottom: 10px;
+      resize: none;
+      background: #f9f9f9;
+      transition: border 0.2s;
+    }
+    textarea:focus {
+      border: 1.5px solid #4f8cff;
+      outline: none;
+      background: #fff;
+    }
+    /* Стили для выравнивания полей ввода */
+    #bulk-search-form .flex-container {
+      display: flex;
+      gap: 20px;
+      align-items: stretch;
+    }
+    #bulk-search-form .flex-container > div {
+      display: flex;
+      flex-direction: column;
+    }
+    #bulk-search-form .flex-container > div:first-child {
+      flex: 1;
+    }
+    #bulk-search-form .flex-container > div:last-child {
+      flex: 0.4;
+      max-width: 200px;
+    }
+    #bulk-search-form label {
+      margin-bottom: 6px;
+      line-height: 1.2;
+      white-space: normal;
+      word-wrap: break-word;
+      min-height: 2.4em;
+      display: flex;
+      align-items: flex-start;
+    }
+    #bulk-search-form textarea {
+      margin-top: 0;
+      margin-bottom: 0;
+      flex: 1;
+    }
+    /* Дополнительные стили для точного выравнивания */
+    #bulk-search-form .flex-container > div:last-child {
+      margin-top: 0; /* Опускаем правое поле на уровень левого */
+    }
+    #bulk-search-form .flex-container > div:last-child label {
+      margin-top: 0;
+    }
+    #bulk-search-form .flex-container > div:last-child textarea {
+      margin-top: 0;
+    }
+    
+    /* Стили для правого поля поиска по наименованию */
+    #name-search-input {
+      margin-top: 0;
+    }
+    input[type="text"] {
+      font-size: 1.08em;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #d0d7de;
+      margin-right: 8px;
+      margin-bottom: 10px;
+      background: #f9f9f9;
+      transition: border 0.2s;
+    }
+    input[type="text"]:focus {
+      border: 1.5px solid #4f8cff;
+      outline: none;
+      background: #fff;
+    }
+    button {
+      font-size: 1.08em;
+      padding: 8px 22px;
+      border-radius: 8px;
+      border: none;
+      background: #4f8cff;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(79,140,255,0.08);
+      transition: background 0.18s, box-shadow 0.18s;
+    }
+    button:hover {
+      background: #2563eb;
+      box-shadow: 0 4px 16px rgba(79,140,255,0.13);
+    }
+    .btn-copy {
+      padding: 2px 10px;
+      font-size: 1em;
+      line-height: 1.1;
+      border-radius: 7px;
+      background: #e0e7ff;
+      color: #6366f1;
+      border: none;
+      box-shadow: 0 1px 4px rgba(80,120,255,0.07);
+      transition: background 0.15s, color 0.15s;
+    }
+    .btn-copy:hover {
+      background: #6366f1;
+      color: #fff;
+    }
+    #update-info, #supplier-updates {
+      color: #555;
+      margin-bottom: 10px;
+      font-size: 0.98em;
+    }
+    table {
+      border-collapse: collapse;
+      width: auto;
+      min-width: 0;
+      table-layout: auto;
+      background: #fff;
+      border-radius: 0;
+      overflow: hidden;
+      font-size: 0.97em;
+      box-shadow: none;
+      position: relative;
+    }
+    
+
+    th, td {
+      border: 1px solid #e5e7eb;
+      padding: 3px 4px;
+      text-align: left;
+      font-size: 0.97em;
+      white-space: pre-line;
+      word-break: break-word;
+      max-width: 120px;
+      max-height: 60px;
+      overflow: hidden;
+    }
+    /* Одинаковая высота для всех строк */
+    tr td {
+      max-height: 40px !important;
+      overflow: hidden !important;
+    }
+
+    th:nth-child(1), td:nth-child(1) { width: 400px !important; min-width: 400px !important; max-width: 400px !important; } /* Наименование - 6.6 см */
+    /* Исключение для столбца чекбоксов */
+    th:nth-child(1).checkbox-column, td:nth-child(1).checkbox-column { width: 18px !important; min-width: 18px !important; max-width: 18px !important; }
+    th:nth-child(2), td:nth-child(2) { width: 118px !important; min-width: 118px !important; max-width: 118px !important; } /* Бренд - 2.4 см */
+    th:nth-child(3), td:nth-child(3) { width: 173px !important; min-width: 173px !important; max-width: 173px !important; } /* Партномер - 3 см */
+    th:nth-child(4), td:nth-child(4) { width: 159px !important; min-width: 159px !important; max-width: 159px !important; } /* Цена (USD, ЦБ) - 2 см */
+    th:nth-child(5), td:nth-child(5) { width: 180px !important; min-width: 180px !important; max-width: 225px !important; } /* Наличие (шт) - 1.5 см */
+    th:nth-child(6), td:nth-child(6) { width: 151px !important; min-width: 151px !important; max-width: 151px !important; } /* Дистр - 2.5 см */
+    th:nth-child(7), td:nth-child(7) { width: 159px !important; min-width: 159px !important; max-width: 159px !important; } /* Треб кол - 2 см */
+    
+    th, td { vertical-align: middle; }
+    input.required-qty-input {
+      width: 90px !important;
+      min-width: 0;
+      font-size: 1.05em;
+      padding: 3px 6px;
+      text-align: center;
+      display: block;
+      margin: 0 auto;
+    }
+    button, .btn-copy, .btn-update-qty, .btn-supplier, .shorten-btn { font-size: 0.95em !important; padding: 2px 8px !important; min-width: 0 !important; }
+    th {
+      background: #f0f4fa;
+      font-weight: 600;
+      color: #222;
+    }
+    tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+    tr.main-row {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 1.5px 8px rgba(80,120,255,0.04);
+      transition: box-shadow 0.18s;
+    }
+    tr.main-row:hover {
+      box-shadow: 0 4px 24px rgba(80,120,255,0.13);
+      background: #e0e7ff;
+    }
+    .notfound-row {
+      color: #ff2222;
+      background: #fff7f7;
+      font-weight: bold;
+      font-size: 1.05em;
+      font-family: inherit;
+      border-radius: 8px;
+    }
+    .copy-toast {
+      position: absolute;
+      background: #222;
+      color: #fff;
+      padding: 4px 14px;
+      border-radius: 6px;
+      font-size: 1em;
+      z-index: 9999;
+      opacity: 0.95;
+      pointer-events: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+      transition: opacity 0.3s;
+    }
+    @media (max-width: 700px) {
+      .container {
+        width: 100vw;
+        max-width: none;
+        padding: 10px 0 18px 0;
+      }
+      table, th, td {
+        font-size: 0.95em;
+      }
+      textarea, input[type="text"] {
+        font-size: 1em;
+      }
+      .table-wrapper {
+        margin-top: 12px;
+        width: 100vw;
+      }
+      /* Адаптивность для полей ввода */
+      #bulk-search-form .flex-container {
+        flex-direction: column;
+        gap: 16px;
+      }
+      #bulk-search-form .flex-container > div:last-child {
+        flex: 1;
+        margin-top: 0;
+      }
+      #bulk-search-form label {
+        min-height: auto;
+        line-height: 1.3;
+      }
+    }
+    button.btn-update-qty, button.btn-supplier {
+      font-size: 0.98em;
+      padding: 4px 18px;
+      min-width: 90px;
+      min-height: 28px;
+      border-radius: 7px;
+      margin: 2px 0;
+      box-shadow: 0 1px 4px rgba(79,140,255,0.07);
+    }
+    button.btn-update-qty { background: #4f8cff; }
+    button.btn-supplier { background: #2563eb; }
+    button.btn-update-qty:hover { background: #2563eb; }
+    button.btn-supplier:hover { background: #4f8cff; }
+    .shorten-btn {
+      font-size: 0.92em;
+      padding: 2px 10px;
+      margin-bottom: 2px;
+      border-radius: 6px;
+      background: #e0e7ff;
+      color: #6366f1;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .shorten-btn:hover {
+      background: #6366f1;
+      color: #fff;
+    }
+    .align-right {
+      text-align: right !important;
+      font-variant-numeric: tabular-nums;
+    }
+    .th-flex {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    /* Стили для невидимого столбца с чекбоксами */
+    table th.checkbox-column,
+    table td.checkbox-column,
+    th:first-child.checkbox-column,
+    td:first-child.checkbox-column {
+      width: 18px !important;
+      min-width: 18px !important;
+      max-width: 18px !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      border: none !important;
+      background: #fff !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
+      text-align: left !important;
+
+    }
+    .checkbox-column input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      margin: 0 !important;
+      padding: 0 !important;
+      cursor: pointer;
+      background: transparent !important;
+      border: none !important;
+      display: block !important;
+      box-sizing: border-box !important;
+
+    }
+    /* --- ДОБАВЛЕНО: визуальные индикаторы сортировки --- */
+    th.sortable {
+      position: relative;
+      user-select: none;
+      cursor: pointer;
+    }
+    th.sortable::before {
+      content: '↕';
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      color: #9ca3af;
+      opacity: 0.5;
+      transition: all 0.2s ease;
+    }
+    th.sortable:hover::before {
+      opacity: 1;
+      color: #4f8cff;
+    }
+    th.sort-asc::before {
+      content: '↑';
+      color: #10b981;
+      opacity: 1;
+    }
+    th.sort-desc::before {
+      content: '↓';
+      color: #ef4444;
+      opacity: 1;
+    }
+    .controls button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: white;
+      background: #3b82f6;
+    }
+    .controls button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      background: #2563eb;
+    }
+    .controls button:active {
+      transform: translateY(0);
+    }
+    #supplier-updates {
+      transition: opacity 0.3s;
+    }
+    #supplier-updates.fade {
+      opacity: 0.3;
+    }
+
+    
+    .th-flex {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    th:nth-child(7), td:nth-child(7) { width: 159px !important; min-width: 159px !important; max-width: 159px !important; } /* Треб кол - 2 см */
+    
+    /* Стили для таблицы с чекбоксами (поиск по наименованию) */
+    /* Когда есть чекбоксы, все столбцы сдвигаются на +1 позицию */
+    th:nth-child(2).checkbox-column, td:nth-child(2).checkbox-column { width: 18px !important; min-width: 18px !important; max-width: 18px !important; } /* Чекбокс */
+    th:nth-child(2):not(.checkbox-column), td:nth-child(2):not(.checkbox-column) { width: 400px !important; min-width: 400px !important; max-width: 400px !important; } /* Наименование */
+    th:nth-child(3), td:nth-child(3) { width: 118px !important; min-width: 118px !important; max-width: 118px !important; } /* Бренд */
+    th:nth-child(4), td:nth-child(4) { width: 173px !important; min-width: 173px !important; max-width: 173px !important; } /* Партномер */
+    th:nth-child(5), td:nth-child(5) { width: 159px !important; min-width: 159px !important; max-width: 159px !important; } /* Цена (USD, ЦБ) */
+    th:nth-child(6), td:nth-child(6) { width: 180px !important; min-width: 180px !important; max-width: 225px !important; } /* Наличие (шт) */
+    th:nth-child(7), td:nth-child(7) { width: 151px !important; min-width: 151px !important; max-width: 151px !important; } /* Дистр */
+    th:nth-child(8), td:nth-child(8) { width: 159px !important; min-width: 159px !important; max-width: 159px !important; } /* Треб кол */
+    
+    th, td { vertical-align: middle; }
+  </style>
+</head>
+<body>
+    <div class="container">
+    <h2>Поиск товара по партномеру или названию</h2>
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+        <button id="toggle-supplier-updates" onclick="toggleSupplierUpdates()" style="padding: 4px 8px; font-size: 0.8em; background: #f3f4f6; color: #9ca3af; border: none; border-radius: 4px; cursor: pointer; opacity: 0.7;">
+          🔽
+        </button>
+      </div>
+    <ul id="supplier-updates" style="list-style: none; padding: 0; margin: 0;"></ul>
+    <div id="cbr-rate-info" class="cbr-rate"></div>
+    
+          <!-- Два столбца: поиск по партномерам слева, поиск по наименованию справа -->
+      <div style="display: flex; gap: 18px; margin-bottom: 16px;">
+      <!-- Левый столбец: Поиск по партномерам -->
+      <div style="flex: 1; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
+        <h3 style="margin-top: 0; color: #374151;">📋 Поиск по списку партномеров</h3>
+        <form id="bulk-search-form" method="post" action="/search">
+          <div class="flex-container">
+            <div>
+              <label for="part_numbers">Парт-номера (вставьте столбец из Excel):</label>
+              <textarea name="part_numbers" id="part_numbers" rows="10" cols="30" placeholder="PRIME H610I-PLUS D4-CSM
+PRO H610M-C D4-CSM
+PRIME H610M-R D4-SI"></textarea>
+            </div>
+            <div>
+              <label for="quantities">Количество (вставьте столбец из Excel):</label>
+              <textarea name="quantities" id="quantities" rows="10" cols="10" placeholder="2
+1
+5"></textarea>
+            </div>
+          </div>
+          <div id="input-warning" style="color: #c00; font-size: 1.05em; margin: 6px 0 0 0; display: none;"></div>
+          <button type="submit" style="min-width: 120px; height: 40px; margin-top: 12px;">🔍 Найти</button>
+        </form>
+      </div>
+      
+      <!-- Правый столбец: Поиск по наименованию -->
+      <div style="flex: 1; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
+        <h3 style="margin-top: 0; color: #374151;">🔍 Поиск по наименованию</h3>
+        <div style="margin-bottom: 15px;">
+          <label for="name-search-input">Поисковый запрос:</label><br>
+            <textarea id="name-search-input" name="name-search-input" rows="10" cols="30" placeholder="Например: процессор core, материнская плата, монитор 24" style="margin-top: 24px;"></textarea>
+        </div>
+        
+        <div style="margin-top: 12px;">
+          <button type="button" onclick="performNameSearch()" style="min-width: 120px; height: 40px;">🔍 Найти</button>
+          </div>
+      </div>
+    </div>
+    <br>
+    <div class="controls" style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center;">
+      <button id="show-full-btn" onclick="toggleShortName()">Показать полностью</button>
+    </div>
+
+    
+    <!-- Единая таблица результатов -->
+    <div id="table-container"></div>
+  </div>
+
+  <script>
+    // ВОССТАНАВЛИВАЮ исходные headers, tailHeaders, noCopyHeaders
+    const headers = [
+      "Наименование", "Бренд", "Партномер", "Цена (USD, ЦБ)", "Наличие (шт)", "Дистр", "Треб кол"
+    ];
+    const tailHeaders = [
+      "Цена (RUB)", "Цена (USD)", "Суммарное наличие", "Объем упаковки, м3", "Вес упаковки, кг", "Технические характеристики", "Дата транзита"
+    ];
+    const noCopyHeaders = [
+      "Треб кол",
+      "Объем упаковки, м3",
+      "Вес упаковки, кг",
+      "Технические характеристики",
+      "Дата транзита"
+    ];
+    // --- Копирование столбца ---
+    // --- Получение курса ЦБ РФ ---
+    async function fetchCbrUsdRate() {
+      try {
+        const res = await fetch('/usd_rate?' + new Date().getTime());
+        const data = await res.json();
+        console.log('Курс через наш API:', data.rate, data.date);
+        return {
+          rate: data.rate,
+          date: data.date
+        };
+      } catch (error) {
+        console.error('Ошибка получения курса через наш API:', error);
+        return { rate: null, date: '' };
+      }
+    }
+
+    // Обновление курса при загрузке страницы
+    async function updateCbrRate() {
+      const cbr = await fetchCbrUsdRate();
+      window._lastCbrRate = cbr;
+      const rateInfo = cbr.rate ? `Курс ЦБ РФ: 1 USD = ${cbr.rate.toFixed(2)} RUB${cbr.date ? ' (' + cbr.date + ')' : ''}` : 'Курс ЦБ РФ: не удалось получить';
+      const rateElement = document.getElementById('cbr-rate-info');
+      if (rateElement) {
+        rateElement.innerText = rateInfo;
+        // Добавляем предупреждение если данные старые
+        if (cbr.date && cbr.date.includes('дн. назад')) {
+          rateElement.style.color = '#d97706';
+          rateElement.title = 'Внимание: курс может быть неактуальным (выходные/праздники)';
+        } else {
+          rateElement.style.color = '';
+          rateElement.title = '';
+        }
+      }
+    }
+
+    // Обновляем курс при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+      updateCbrRate();
+      
+
+    });
+
+
+    // --- Копирование столбца с учётом USD ЦБ ---
+    // Fallback для старых браузеров и если navigator.clipboard временно недоступен
+    function fallbackCopyTextToClipboard(text, header) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        const btn = document.getElementById('copy-btn-' + header);
+        if (btn) {
+          const old = btn.innerText;
+          btn.innerText = 'Скопировано!';
+          btn.disabled = true;
+          setTimeout(() => { btn.innerText = '⧉'; btn.disabled = false; }, 1000);
+        }
+      } catch (err) {
+        alert('Не удалось скопировать текст автоматически. Скопируйте вручную.');
+      }
+      document.body.removeChild(textarea);
+    }
+    function renderGroupedTable(data) {
+      let html = '<div class="table-wrapper"><table><tr>';
+      // Заголовки с кнопками копирования
+      headers.forEach(h => {
+        html += `<th>${h}`;
+        if (!noCopyHeaders.includes(h)) {
+          html += ` <button id="copy-btn-${h}" onclick="copyColumn('${h}')" class="btn-copy">⧉</button>`;
+        }
+        html += `</th>`;
+      });
+      html += '<th></th>';
+      tailHeaders.forEach(h => {
+        html += `<th>${h}`;
+        if (!noCopyHeaders.includes(h)) {
+          html += ` <button id="copy-btn-${h}" onclick="copyColumn('${h}')" class="btn-copy">⧉</button>`;
+        }
+        html += `</th>`;
+      });
+      html += '</tr>';
+      data.forEach((item, idx) => {
+        if (!item.offers || item.offers.length === 0) return;
+        let offerIdx = 0;
+        html += `<tr id="row-${idx}">` +
+          headers.map(h => `<td id="cell-${idx}-${h}">${item.offers[0][h] !== null && item.offers[0][h] !== undefined && item.offers[0][h] !== '' ? item.offers[0][h] : '-'}</td>`).join('') +
+          `<td><button onclick="switchSupplier(${idx})" class="btn-supplier">Сменить поставщика (${item.offers.length})</button></td>` +
+          tailHeaders.map(h => `<td id="cell-${idx}-${h}">${item.offers[0][h] !== null && item.offers[0][h] !== undefined && item.offers[0][h] !== '' ? item.offers[0][h] : '-'}</td>`).join('') +
+          '</tr>';
+      });
+      html += '</table></div>';
+      document.getElementById('table-container').innerHTML = html;
+      window._groupedOffers = data;
+      window._currentOfferIdx = Array(data.length).fill(0);
+    }
+    window.switchSupplier = function(rowIdx) {
+      const offers = window._groupedOffers[rowIdx].offers;
+      let idx = window._currentOfferIdx[rowIdx];
+      idx = (idx + 1) % offers.length;
+      window._currentOfferIdx[rowIdx] = idx;
+      const offer = offers[idx];
+      headers.forEach(h => {
+        if (h === "Цена (USD, ЦБ)") {
+          let usd = offer["Цена (USD)"];
+          let rub = offer["Цена (RUB)"];
+          let val = "-";
+          if (usd !== undefined && usd !== null && usd !== '' && usd !== '-') {
+            val = usd;
+          } else if (rub !== undefined && rub !== null && rub !== '' && rub !== '-' && window._lastCbrRate && window._lastCbrRate.rate) {
+            let numRub = parseFloat(rub);
+            if (!isNaN(numRub) && numRub > 0) {
+              val = (numRub / window._lastCbrRate.rate).toFixed(2);
+            }
+          }
+          document.getElementById(`cell-${rowIdx}-${h}`).innerText = val;
+        } else {
+          document.getElementById(`cell-${rowIdx}-${h}`).innerText = offer[h] !== null && offer[h] !== undefined && offer[h] !== '' ? offer[h] : '-';
+        }
+      });
+      // Обновляем tailHeaders (ячейки после кнопки)
+      tailHeaders.forEach(h => {
+        document.getElementById(`cell-${rowIdx}-${h}`).innerText = offer[h] !== null && offer[h] !== undefined && offer[h] !== '' ? offer[h] : '-';
+      });
+    }
+    async function search() {
+      const name = document.getElementById('name').value.trim();
+      
+      // Очищаем глобальное состояние перед новым поиском
+      window._currentOfferIdx = [];
+      window._lastTableDataWithGaps = null;
+      window._isCheckboxesVisible = false;
+      
+      let url = '/search?';
+      if (name) url += 'name=' + encodeURIComponent(name);
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.length === 0) {
+        document.getElementById('table-container').innerHTML = '<p>Ничего не найдено</p>';
+        return;
+      }
+      // Преобразуем данные в формат для основной таблицы
+      const tableData = data.map(item => ({
+        part_number: item["Партномер"],
+        name: item["Наименование"],
+        brand: item["Бренд"],
+        sortedOffers: [{
+          "Наименование": item["Наименование"],
+          "Бренд": item["Бренд"],
+          "Партномер": item["Партномер"],
+          "Цена (USD, ЦБ)": item["Цена (USD)"] || '-',
+          "Наличие (шт)": item["Наличие (шт)"] || '0',
+          "Дистр": item["Дистрибьютор"],
+          "Треб кол": "1",
+          "Цена (RUB)": item["Цена (RUB)"] || '-',
+          "Цена (USD)": item["Цена (USD)"] || '-',
+          "Суммарное наличие": item["Наличие (шт)"] || '0',
+          "Объем упаковки, м3": item["Объем упаковки, м3"] || '-',
+          "Вес упаковки, кг": item["Вес упаковки, кг"] || '-',
+          "Технические характеристики": item["Технические характеристики"] || '-',
+          "Дата транзита": item["Дата транзита"] || '-'
+        }],
+        requiredQty: 1,
+        minUsd: parseFloat(item["Цена (USD)"]) || 0,
+        total_stock: parseInt(item["Наличие (шт)"]) || 0
+      }));
+      
+      // Сохраняем данные и отображаем таблицу
+      window._lastTableDataWithGaps = tableData;
+      window._currentOfferIdx = tableData.map(x => 0);
+      renderGroupedTableWithGaps(tableData, false);
+    }
+    // Флаг для предотвращения дублирования
+    let isUpdatingSuppliers = false;
+    
+    async function showSupplierUpdates() {
+      // Защита от дублирования
+      if (isUpdatingSuppliers) {
+        console.log('showSupplierUpdates уже выполняется, пропускаем');
+        return;
+      }
+      
+      isUpdatingSuppliers = true;
+      
+      const suppliers = [
+        {name: 'Merlion', file: 'last_update_merlion.txt'},
+        
+        {name: 'Netlab', file: 'last_update_netlab.txt'},
+        {name: 'Treolan', file: 'last_update_treolan.txt'},
+        {name: 'VVP', file: 'last_update_vvp.txt'},
+        {name: 'Marvel', file: 'last_update_marvel.txt'},
+        {name: 'OCS SALE', file: 'last_update_ocs_sale.txt'},
+        {name: 'OCS', file: 'last_update_ocs.txt'},
+      ];
+      const list = document.getElementById('supplier-updates');
+      list.innerHTML = '';
+      for (const s of suppliers) {
+        try {
+          // Добавляем timestamp для избежания кэширования
+          const timestamp = new Date().getTime();
+          const res = await fetch(`${s.file}?t=${timestamp}`);
+          let text = 'дата неизвестна';
+          let timeAgo = '';
+          let statusColor = '#999';
+          
+          if (res.ok) {
+            text = await res.text();
+            text = text.trim(); // Убираем лишние пробелы
+            
+            // Вычисляем время, прошедшее с последнего обновления
+            try {
+              const lastUpdate = new Date(text.replace(' ', 'T'));
+              const now = new Date();
+              const diffMs = now - lastUpdate;
+              const diffMinutes = Math.floor(diffMs / (1000 * 60));
+              const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+              const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+              
+              if (diffDays > 0) {
+                timeAgo = `(${diffDays} дн. назад)`;
+                statusColor = '#dc3545'; // красный для старых данных
+              } else if (diffHours > 0) {
+                timeAgo = `(${diffHours} ч. назад)`;
+                statusColor = diffHours > 2 ? '#fd7e14' : '#28a745'; // оранжевый/зеленый
+              } else if (diffMinutes > 0) {
+                timeAgo = `(${diffMinutes} мин. назад)`;
+                statusColor = '#28a745'; // зеленый для свежих данных
+              } else {
+                timeAgo = '(только что)';
+                statusColor = '#28a745'; // зеленый
+              }
+            } catch (e) {
+              timeAgo = '';
+              statusColor = '#999';
+            }
+          }
+          
+          const li = document.createElement('li');
+          li.style.marginBottom = '3px';
+          li.style.padding = '2px';
+          li.style.borderLeft = `3px solid ${statusColor}`;
+          li.style.paddingLeft = '6px';
+          li.style.fontSize = '14px';
+          li.innerHTML = `
+            <strong>${s.name}</strong>: 
+            <span style="color: #666; font-size: 12px;">${text}</span> 
+            <span style="color: ${statusColor}; font-weight: bold; font-size: 12px;">${timeAgo}</span>
+          `;
+          list.appendChild(li);
+        } catch (error) {
+          console.error(`Ошибка загрузки ${s.name}:`, error);
+          const li = document.createElement('li');
+          li.style.marginBottom = '3px';
+          li.style.padding = '2px';
+          li.style.borderLeft = '3px solid #dc3545';
+          li.style.paddingLeft = '6px';
+          li.style.fontSize = '14px';
+          li.innerHTML = `<strong>${s.name}</strong>: <span style="color: #dc3545; font-size: 12px;">дата неизвестна</span>`;
+          list.appendChild(li);
+        }
+      }
+      
+      // Сбрасываем флаг после завершения
+      isUpdatingSuppliers = false;
+    }
+    
+    // Функция для обновления статуса поставщиков
+    function updateSupplierStatus() {
+      const list = document.getElementById('supplier-updates');
+      list.classList.add('fade');
+      setTimeout(async () => {
+        await showSupplierUpdates();
+        list.classList.remove('fade');
+      }, 200);
+    }
+    
+    // Первоначальная загрузка
+    updateSupplierStatus();
+    
+    // Автообновление каждые 30 секунд
+    setInterval(updateSupplierStatus, 300000); // 5 минут
+    
+    // Функция для скрытия/показа времени выгрузки дистрибьюторов
+    window.toggleSupplierUpdates = function() {
+      const supplierUpdates = document.getElementById('supplier-updates');
+      const toggleButton = document.getElementById('toggle-supplier-updates');
+      
+      if (supplierUpdates.style.display === 'none') {
+        // Показываем время выгрузки
+        supplierUpdates.style.display = 'block';
+        toggleButton.innerHTML = '🔽';
+        toggleButton.style.background = '#f3f4f6';
+        toggleButton.style.color = '#9ca3af';
+      } else {
+        // Скрываем время выгрузки
+        supplierUpdates.style.display = 'none';
+        toggleButton.innerHTML = '▶️';
+        toggleButton.style.background = '#f3f4f6';
+        toggleButton.style.color = '#9ca3af';
+      }
+    };
+
+    // Удаляю отдельное поле и кнопку поиска по названию
+    // Изменяю обработку формы bulk-search: каждая строка ищется и по part_number, и по части названия
+    document.getElementById('bulk-search-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      // Очищаем глобальное состояние перед новым поиском
+      window._currentOfferIdx = [];
+      window._lastTableDataWithGaps = null;
+      window._isCheckboxesVisible = false;
+      
+      const partTextarea = document.getElementById('part_numbers');
+      const qtyTextarea = document.getElementById('quantities');
+      const warning = document.getElementById('input-warning');
+      const partLines = partTextarea.value.split(/\r?\n/);
+      const qtyLines = qtyTextarea.value.split(/\r?\n/);
+      
+      // Автодополнение: если qtyLines меньше, чем partLines, дополняем пустыми строками
+      if (qtyLines.length < partLines.length) {
+        for (let i = qtyLines.length; i < partLines.length; i++) qtyLines.push('');
+      }
+      if (partLines.length !== qtyLines.length) {
+        warning.style.display = '';
+        warning.innerText = `Количество строк не совпадает: парт-номеров — ${partLines.length}, количеств — ${qtyLines.length}. Проверьте корректность вставки!`;
+        return;
+      } else {
+        warning.style.display = 'none';
+      }
+      // Собираем пары, учитывая пустые строки
+      const parsedLines = partLines.map((part, idx) => {
+        let qty = qtyLines[idx] !== undefined ? qtyLines[idx] : '';
+        let qtyNum = parseInt(qty.replace(/[^0-9]/g, ''), 10);
+        return { part, qty: part === '' ? '' : (isNaN(qtyNum) ? 1 : qtyNum) };
+      });
+      const queryPartNumbers = parsedLines.map(x => x.part).join(',');
+      
+      // Получаем курс ЦБ РФ
+      const cbr = await fetchCbrUsdRate();
+      window._lastCbrRate = cbr;
+      const rateInfo = cbr.rate ? `Курс ЦБ РФ: 1 USD = ${cbr.rate.toFixed(2)} RUB${cbr.date ? ' (' + cbr.date + ')' : ''}` : 'Курс ЦБ РФ: не удалось получить';
+      const rateElement = document.getElementById('cbr-rate-info');
+      if (rateElement) {
+        rateElement.innerText = rateInfo;
+        // Добавляем предупреждение если данные старые
+        if (cbr.date && cbr.date.includes('дн. назад')) {
+          rateElement.style.color = '#d97706';
+          rateElement.title = 'Внимание: курс может быть неактуальным (выходные/праздники)';
+        } else {
+          rateElement.style.color = '';
+          rateElement.title = '';
+        }
+      }
+      // --- Двухшаговый поиск ---
+      // 1. Поиск по part_number (точное совпадение)
+      let res1 = await fetch(`/search/grouped?part_numbers=${encodeURIComponent(queryPartNumbers)}`);
+      let data1 = await res1.json();
+      
+      const pnMap = {};
+      data1.forEach(item => {
+        if (item.part_number) {
+          // Очищаем партномер от пробелов и приводим к нижнему регистру
+          const cleanPartNumber = item.part_number.trim().toLowerCase();
+          pnMap[cleanPartNumber] = item;
+        }
+      });
+      // 2. Для не найденных строк — поиск по name (подстрока)
+      const notFoundLines = parsedLines.map(x => x.part.trim()).filter(line => line && !pnMap[line.trim().toLowerCase()]);
+      let nameResults = [];
+      let nameMap = {};
+      if (notFoundLines.length > 0) {
+        let res2 = await fetch(`/search/grouped?name=${encodeURIComponent(notFoundLines.join(","))}`);
+        nameResults = await res2.json();
+
+        nameResults.forEach(item => {
+          if (item && item.name) {
+            nameMap[item.name.trim().toLowerCase()] = item;
+          }
+        });
+      }
+      // 3. Сопоставление результатов + сортировка офферов по USD один раз
+      const tableData = parsedLines.map(({part, qty}) => {
+        // Очищаем партномер от пробелов и приводим к нижнему регистру
+        const key = part.trim().toLowerCase();
+        if (/^\s*$/.test(part)) return { _empty: true };
+        let item = null;
+        if (pnMap[key]) item = pnMap[key];
+        else {
+          item = nameResults.find(i => i && i.name && i.name.toLowerCase().includes(key));
+        }
+        if (item && item.offers && item.offers.length > 0) {
+          
+          // Маппим поле "Дистрибьютор" в "Дистр" для совместимости с таблицей
+          const mappedOffers = item.offers.map(offer => ({
+            ...offer,
+            "Дистр": offer["Дистрибьютор"] || offer["Дистр"] || "-"
+          }));
+          
+          // Сортируем офферы: сначала с наличием > 0, потом с наличием = 0
+          const sortedOffers = [...mappedOffers].sort((a, b) => {
+            function getUsdCbr(off) {
+              let usd = off["Цена (USD)"];
+              let rub = off["Цена (RUB)"];
+              let val = null;
+              if (usd !== undefined && usd !== null && usd !== '' && usd !== '-') {
+                val = parseFloat(usd.toString().replace(',', '.').replace(/[^0-9.\-]/g, ''));
+              }
+              if ((val === null || isNaN(val) || val === 0) && rub !== undefined && rub !== null && rub !== '' && rub !== '-' && window._lastCbrRate && window._lastCbrRate.rate) {
+                let numRub = parseFloat(rub);
+                if (!isNaN(numRub) && numRub > 0) {
+                  val = numRub / window._lastCbrRate.rate;
+                }
+              }
+              return (val !== null && !isNaN(val)) ? val : Infinity;
+            }
+            
+            function getStockValue(off) {
+              let stock = off["Наличие (шт)"];
+              if (stock === undefined || stock === null || stock === '' || stock === '-') {
+                return 0;
+              }
+              
+              // Если это число
+              if (typeof stock === 'number') {
+                return stock;
+              }
+              
+              // Если это строка, извлекаем цифры
+              let stockStr = stock.toString().trim();
+              let stockDigits = stockStr.replace(/[^0-9]/g, '');
+              return stockDigits ? parseInt(stockDigits, 10) : 0;
+            }
+            
+            // Получаем значения для сортировки
+            let stockA = getStockValue(a);
+            let stockB = getStockValue(b);
+            let priceA = getUsdCbr(a);
+            let priceB = getUsdCbr(b);
+            
+            // Сначала сортируем по наличию: товары с наличием > 0 идут первыми
+            if (stockA > 0 && stockB === 0) return -1;  // A с наличием > 0, B с наличием = 0
+            if (stockA === 0 && stockB > 0) return 1;   // A с наличием = 0, B с наличием > 0
+            
+            // Если оба с наличием > 0 или оба с наличием = 0, сортируем по цене
+            if (stockA > 0 && stockB > 0) {
+              // Оба с наличием > 0 - сортируем по возрастанию цены
+              return priceA - priceB;
+            } else if (stockA === 0 && stockB === 0) {
+              // Оба с наличием = 0 - сортируем по возрастанию цены
+              return priceA - priceB;
+            }
+            
+            // Если один с наличием > 0, а другой с наличием = 0, то с наличием > 0 идет первым
+            return stockB - stockA;
+          });
+          // Добавляем вычисление минимальной цены USD для глобальной сортировки
+          let minUsd = Infinity;
+          sortedOffers.forEach(off => {
+            let usd = off["Цена (USD)"];
+            let rub = off["Цена (RUB)"];
+            let val = null;
+            if (usd !== undefined && usd !== null && usd !== '' && usd !== '-') {
+              val = parseFloat(usd.toString().replace(',', '.').replace(/[^0-9.\-]/g, ''));
+            }
+            if ((val === null || isNaN(val) || val === 0) && rub !== undefined && rub !== null && rub !== '' && rub !== '-' && window._lastCbrRate && window._lastCbrRate.rate) {
+              let numRub = parseFloat(rub);
+              if (!isNaN(numRub) && numRub > 0) {
+                val = numRub / window._lastCbrRate.rate;
+              }
+            }
+            if (val !== null && !isNaN(val) && val < minUsd) minUsd = val;
+          });
+          return { ...item, sortedOffers, requiredQty: qty, minUsd };
+        }
+        if (item && (!item.offers || item.offers.length === 0)) {
+          return { _notfound: part };
+        }
+        if (!item) {
+          return { _notfound: part };
+        }
+        return item;
+      });
+      // --- Удаляем глобальную сортировку tableData ---
+      // tableData.sort(...) // Удалено!
+      // После формирования tableData просто сбрасываем window._currentOfferIdx
+      window._currentOfferIdx = tableData.map(x => (x && x.sortedOffers && x.sortedOffers.length > 0 ? 0 : null));
+      renderGroupedTableWithGaps(tableData, false);
+      // Принудительно перерисовываем таблицу через небольшую задержку
+      setTimeout(() => {
+        renderGroupedTableWithGaps(tableData, false);
+      }, 100);
+      showSupplierUpdates();
+    });
+
+    document.getElementById('part_numbers').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.ctrlKey && !e.shiftKey) {
+        e.preventDefault();
+        document.getElementById('bulk-search-form').requestSubmit();
+      }
+    });
+
+    document.getElementById('quantities').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.ctrlKey && !e.shiftKey) {
+        e.preventDefault();
+        document.getElementById('bulk-search-form').requestSubmit();
+      }
+    });
+
+    // Обработчик Enter для поиска по наименованию
+    document.addEventListener('DOMContentLoaded', function() {
+      const nameSearchInput = document.getElementById('name-search-input');
+      if (nameSearchInput) {
+        nameSearchInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            performNameSearch();
+          }
+        });
+      }
+    });
+
+    // --- Авторазделение при вставке двух столбцов ---
+    document.getElementById('part_numbers').addEventListener('paste', function(e) {
+      const textarea = this;
+      // Получаем вставляемый текст
+      let paste = (e.clipboardData || window.clipboardData).getData('text');
+      // Проверяем, есть ли в большинстве строк разделитель (таб или ;)
+      const lines = paste.split(/\r?\n/);
+      let sep = null;
+      let tabCount = lines.filter(l => l.includes('\t')).length;
+      let semiCount = lines.filter(l => l.includes(';')).length;
+      if (tabCount > lines.length / 2) sep = '\t';
+      else if (semiCount > lines.length / 2) sep = ';';
+      if (sep) {
+        // Авторазделение
+        e.preventDefault();
+        const parts = [], qtys = [];
+        lines.forEach(line => {
+          let [part, qty] = line.split(sep);
+          if (part && qty) {
+            parts.push(part.trim().replace(/\r|\n/g, ''));
+            qtys.push((qty + '').replace(/\r|\n/g, '').trim());
+          } else if (part) {
+            parts.push(part.trim().replace(/\r|\n/g, ''));
+            qtys.push('');
+          }
+        });
+        document.getElementById('part_numbers').value = parts.join('\n');
+        document.getElementById('quantities').value = qtys.join('\n');
+      }
+      // иначе — стандартная вставка
+    });
+
+
+
+    // --- Рендер с поддержкой пустых строк, "Товара нет" и USD ЦБ ---
+    // Получить цену в USD (ЦБ) для оффера
+    function getOfferUsdCbr(off) {
+      let usd = off["Цена (USD)"];
+      let rub = off["Цена (RUB)"];
+      
+
+      
+                if (usd !== undefined && usd !== null && usd !== '' && usd !== '-') {
+            let val = parseFloat(usd.toString().replace(',', '.').replace(/[^0-9.\-]/g, ''));
+            if (!isNaN(val) && val > 0) return val;
+          }
+          if (rub !== undefined && rub !== null && rub !== '' && rub !== '-' && window._lastCbrRate && window._lastCbrRate.rate) {
+        let numRub = parseFloat(rub);
+        if (!isNaN(numRub) && numRub > 0) {
+          let result = numRub / window._lastCbrRate.rate;
+          return result;
+        }
+      }
+      return null;
+    }
+
+    // --- Копирование столбца без строк плана закупки ---
+    window.copyColumn = function(colIdx) {
+      const table = document.querySelector('.table-wrapper table');
+      if (!table) return;
+      
+      let values = [];
+      let tbody = table.querySelector('tbody');
+      let trs;
+      
+      if (tbody) {
+        trs = Array.from(tbody.querySelectorAll('tr'));
+      } else {
+        trs = Array.from(table.querySelectorAll('tr'));
+      }
+      
+      // Всегда пропускаем первый <tr> (заголовок)
+      if (trs.length > 0) trs = trs.slice(1);
+      
+      trs.forEach(tr => {
+        if (tr.classList.contains('notfound-row') || tr.classList.contains('empty-row')) {
+          values.push('отсутствует');
+          return;
+        }
+        
+        const tds = tr.querySelectorAll('td');
+        if (tds.length > colIdx) {
+          let val = tds[colIdx].innerText.trim();
+          if (val === '-' || val === '' || /^\s*$/.test(val)) {
+            values.push('отсутствует');
+          } else {
+            values.push(val);
+          }
+        } else {
+          values.push('отсутствует');
+        }
+      });
+      
+      if (values.length > 0) {
+        const textarea = document.createElement('textarea');
+        textarea.value = values.join('\n');
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'absolute';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.select();
+        
+        try {
+          document.execCommand('copy');
+          // Показываем уведомление о копировании
+          showCopyToast(colIdx);
+        } catch (err) {
+          console.error('Ошибка копирования:', err);
+          alert('Не удалось скопировать автоматически. Скопируйте вручную.');
+        }
+        
+        document.body.removeChild(textarea);
+      }
+    }
+
+    // Улучшенная функция показа уведомления о копировании
+    function showCopyToast(colIdx) {
+      // Находим кнопку копирования для этого столбца
+      const btn = document.querySelector(`[data-col-idx="${colIdx}"]`);
+      if (!btn) return;
+      
+      const oldText = btn.innerText;
+      btn.innerText = '✓';
+      btn.style.background = '#10b981';
+      btn.style.color = 'white';
+      
+      setTimeout(() => {
+        btn.innerText = oldText;
+        btn.style.background = '';
+        btn.style.color = '';
+      }, 1500);
+    }
+
+    // --- Функция для преобразования значения наличия в число ---
+    function parseStock(val) {
+      if (!val) return 0;
+      // Если это уже число, возвращаем его
+      if (typeof val === 'number') {
+        return Math.floor(val);
+      }
+      // Если это строка, парсим её
+      if (typeof val === 'string') {
+        val = val.trim().replace(',', '.');
+        if (val.toLowerCase() === 'много') return 99;
+        if (val.includes('+')) {
+          let n = parseFloat(val.split('+')[0]);
+          return isNaN(n) ? 0 : Math.floor(n);
+        }
+        if (val.includes('>')) {
+          let n = parseFloat(val.replace('>', ''));
+          n = isNaN(n) ? 0 : Math.floor(n + 1);
+          return n;
+        }
+        if (val.includes('<')) {
+          let n = parseFloat(val.replace('<', ''));
+          n = isNaN(n) ? 0 : Math.floor(n - 1);
+          return n;
+        }
+        let n = parseFloat(val);
+        n = isNaN(n) ? 0 : Math.floor(n);
+        return n;
+      }
+      return 0;
+    }
+
+    // --- Функция для преобразования наличия Treolan ---
+    function parseStockTreolan(val) {
+      if (val === undefined || val === null) return 0;
+      if (typeof val === 'number') return Math.floor(val);
+      val = val.toString().trim().replace(',', '.');
+      if (val.toLowerCase() === 'много') return 99;
+      if (val === '' || val === '0') return 0;
+      if (val.includes('+')) {
+        let n = parseFloat(val.split('+')[0]);
+        return isNaN(n) ? 0 : Math.floor(n);
+      }
+      if (val.includes('>')) {
+        let n = parseFloat(val.replace('>', ''));
+        n = isNaN(n) ? 0 : Math.floor(n + 1);
+        return n;
+      }
+      if (val.includes('<')) {
+        let n = parseFloat(val.replace('<', ''));
+        n = isNaN(n) ? 0 : Math.floor(n - 1);
+        return n;
+      }
+      let n = parseFloat(val);
+      if (isNaN(n)) return 0;
+      n = Math.floor(n);
+      return n;
+    }
+
+    // --- Функция для визуального форматирования чисел с пробелами и запятыми ---
+    function formatNumberVisual(num, isStock) {
+      // isStock: true для "Наличие (шт)", тогда без десятичных
+      if (typeof num === 'number' && !isNaN(num)) {
+        if (isStock) {
+          return num.toLocaleString('ru-RU', {maximumFractionDigits: 0}).replace(/\u00A0/g, ' ');
+        } else {
+          return num.toLocaleString('ru-RU', {minimumFractionDigits: 2, maximumFractionDigits: 2}).replace(/\u00A0/g, ' ');
+        }
+      }
+      if (typeof num === 'string' && /^\d+(\.\d+)?$/.test(num)) {
+        let n = Number(num);
+        if (isStock) {
+          return n.toLocaleString('ru-RU', {maximumFractionDigits: 0}).replace(/\u00A0/g, ' ');
+        } else {
+          return n.toLocaleString('ru-RU', {minimumFractionDigits: 2, maximumFractionDigits: 2}).replace(/\u00A0/g, ' ');
+        }
+      }
+      return num;
+    }
+
+    let isShortened = false;
+    function applyShortNameState() {
+      const spans = document.querySelectorAll('.product-name');
+      spans.forEach(span => {
+        if (!span.dataset.full) return;
+        if (isShortened) {
+          const words = span.dataset.full.split(' ');
+          span.innerText = words.slice(0,2).join(' ') + (words.length > 2 ? ' ...' : '');
+        } else {
+          span.innerText = span.dataset.full;
+        }
+      });
+      // Исправлено: теперь ищем show-full-btn
+      const btn = document.getElementById('show-full-btn');
+      if (btn) btn.innerText = isShortened ? 'Показать полностью' : 'Сократить наименования';
+      
+
+    }
+    function toggleShortName() {
+      isShortened = !isShortened;
+      applyShortNameState();
+    }
+
+    let isPlanOpen = [];
+    window._isCheckboxesVisible = false; // глобальное состояние чекбоксов
+
+    function renderGroupedTableWithGaps(data, showCheckboxes) {
+      try {
+        // Если showCheckboxes не передан, используем глобальное состояние
+        if (typeof showCheckboxes === 'undefined') {
+          showCheckboxes = window._isCheckboxesVisible;
+        }
+        window._isCheckboxesVisible = showCheckboxes;
+        // Инициализируем isPlanOpen если нужно
+        if (!Array.isArray(isPlanOpen) || isPlanOpen.length !== data.length) {
+          isPlanOpen = Array(data.length).fill(false);
+        }
+        
+        let html = '<div class="table-wrapper"><table><tr>';
+        let offersForDP = null; // объявление в начале функции
+        // Добавляем невидимый столбец для чекбоксов
+        if (showCheckboxes) {
+          html += '<th class="checkbox-column"></th>';
+        }
+      headers.forEach((h, hIdx) => {
+        html += `<th style="white-space:nowrap; font-weight:600; vertical-align:middle;" class="sortable" ondblclick="sortTableByColumn('${h}')" title="Двойной клик для сортировки">`;
+        html += `<span class="th-flex">${h}`;
+        if (!noCopyHeaders.includes(h)) {
+          html += `<button id="copy-btn-${h}" data-col-idx="${hIdx}" onclick="copyColumn(${hIdx}); event.stopPropagation();" class="btn-copy">⧉</button>`;
+        }
+        html += `</span></th>`;
+      });
+      html += '<th style="min-width:110px;max-width:140px;">Действия</th>';
+      html += '<th style="min-width:70px;max-width:90px;">План</th>';
+      tailHeaders.forEach((h, hIdx) => {
+        const colIdx = headers.length + 1 + hIdx;
+        html += `<th style="white-space:nowrap; font-weight:600; vertical-align:middle;" class="sortable" ondblclick="sortTableByColumn('${h}')" title="Двойной клик для сортировки">`;
+        html += `<span class="th-flex">${h}`;
+        if (!noCopyHeaders.includes(h)) {
+          html += `<button id="copy-btn-${h}" data-col-idx="${colIdx}" onclick="copyColumn(${colIdx}); event.stopPropagation();" class="btn-copy">⧉</button>`;
+        }
+        html += `</span></th>`;
+      });
+      html += '</tr>';
+      data.forEach((item, idx) => {
+        if (item._empty) {
+          html += `<tr class="empty-row">`;
+          // Добавляем пустую ячейку для чекбокса
+          if (showCheckboxes) {
+            html += '<td class="checkbox-column"></td>';
+          }
+          headers.forEach((h, hIdx) => {
+            if (h === "Треб кол") {
+              html += `<td style="text-align:center; vertical-align:middle;">
+                <input type="number" min="1" value="${item.requiredQty || 1}" class="required-qty-input" data-idx="${idx}" id="qty-empty-${idx}" name="qty-empty-${idx}">
+              </td>`;
+            } else {
+              html += `<td>&nbsp;</td>`;
+            }
+          });
+          html += `<td>&nbsp;</td><td>&nbsp;</td>`;
+          tailHeaders.forEach((h, hIdx) => {
+            html += `<td>&nbsp;</td>`;
+          });
+          html += `</tr>`;
+          return;
+        }
+        if (item._notfound !== undefined) {
+          html += `<tr><td colspan="${headers.length + tailHeaders.length + 2 + (showCheckboxes ? 1 : 0)}" class="notfound-row">!!! Товара нет: ${item._notfound}</td></tr>`;
+          return;
+        }
+        if (!item.sortedOffers || item.sortedOffers.length === 0) {
+          // Если нет офферов, все равно создаем строку с input полем
+          html += `<tr id="row-${idx}" class="main-row" style="background:#ffeaea;">`;
+          // Добавляем пустую ячейку для чекбокса
+          if (showCheckboxes) {
+            html += '<td class="checkbox-column"></td>';
+          }
+          headers.forEach((h, hIdx) => {
+            if (h === "Треб кол") {
+              html += `<td style="text-align:center; vertical-align:middle;">
+                <input type="number" min="1" value="${item.requiredQty || 1}" class="required-qty-input" data-idx="${idx}" id="qty-no-offers-${idx}" name="qty-no-offers-${idx}">
+              </td>`;
+            } else {
+              html += `<td>&nbsp;</td>`;
+            }
+          });
+          html += `<td>&nbsp;</td><td>&nbsp;</td>`;
+          tailHeaders.forEach((h, hIdx) => {
+            html += `<td>&nbsp;</td>`;
+          });
+          html += `</tr>`;
+          return;
+        }
+
+        let requiredQty = item.requiredQty || 1;
+        if (!window._currentOfferIdx) {
+          window._currentOfferIdx = [];
+        }
+        const offerIdx = window._currentOfferIdx[idx] != null ? window._currentOfferIdx[idx] : 0;
+        const offer = item.sortedOffers[offerIdx];
+        let totalStock = 0;
+        for (const off of item.sortedOffers) {
+          if ((off["Дистр"] || '').toLowerCase() === 'treolan') {
+            totalStock += parseStockTreolan(off["Наличие (шт)"]);
+          } else {
+            totalStock += parseStock(off["Наличие (шт)"]);
+          }
+        }
+        let rowClass = (!isFinite(item.minUsd) || totalStock < requiredQty ? 'style="background:#ffeaea;"' : 'style="background:#eaffea;"');
+        html += `<tr id="row-${idx}" class="main-row" ${rowClass}>`;
+        // Добавляем ячейку с чекбоксом
+        if (showCheckboxes) {
+          html += `<td class="checkbox-column"><input type="checkbox" class="add-to-search-checkbox" data-part="${item.part_number}" onchange="window.togglePartInSearch && window.togglePartInSearch(this)" id="chk-${idx}" name="chk-${idx}"></td>`;
+        }
+        headers.forEach((h, hIdx) => {
+          if (h === "Наименование") {
+            html += `<td id="cell-${idx}-${h}" class="name-cell">`;
+            html += `<span class="product-name" data-full="${offer[h]}">${offer[h]}</span></td>`;
+          } else if (h === "Цена (USD, ЦБ)") {
+            // Используем функцию getOfferUsdCbr для правильного расчета цены
+            const usdCbrPrice = getOfferUsdCbr(offer);
+            const val = usdCbrPrice ? usdCbrPrice.toFixed(2) : '-';
+            html += `<td id="cell-${idx}-${h}" class="align-right" data-raw="${val}">${formatNumberVisual(val)}</td>`;
+          } else if (h === "Наличие (шт)") {
+            if ((offer["Дистр"] || '').toLowerCase() === 'treolan') {
+              html += `<td id="cell-${idx}-${h}" class="align-right" data-raw="${parseStockTreolan(offer[h])}">${formatNumberVisual(parseStockTreolan(offer[h]), true)}</td>`;
+            } else {
+              let val = parseStock(offer[h]);
+              html += `<td id="cell-${idx}-${h}" class="align-right" data-raw="${val}">${formatNumberVisual(val, true)}</td>`;
+            }
+          } else if (h === "Треб кол") {
+            html += `<td style="text-align:center; vertical-align:middle;">
+              <input type="number" min="1" value="${item.requiredQty || 1}" class="required-qty-input" data-idx="${idx}" id="qty-main-${idx}" name="qty-main-${idx}">
+            </td>`;
+          } else {
+            // Выравниваем по правому краю, если это числовой столбец
+            const rightAlignHeaders = ["Цена (RUB)", "Цена (USD)", "Суммарное наличие", "Объем упаковки, м3", "Вес упаковки, кг"];
+            const alignClass = rightAlignHeaders.includes(h) ? 'align-right' : '';
+            // Для столбца "Партномер" не применяем числовое форматирование
+            if (h === "Партномер") {
+              html += `<td id="cell-${idx}-${h}" class="${alignClass}" data-raw="${offer[h] !== null && offer[h] !== undefined && offer[h] !== '' ? offer[h] : '-'}">${offer[h] !== null && offer[h] !== undefined && offer[h] !== '' ? offer[h] : '-'}</td>`;
+            } else {
+              html += `<td id="cell-${idx}-${h}" class="${alignClass}" data-raw="${offer[h] !== null && offer[h] !== undefined && offer[h] !== '' ? offer[h] : '-'}">${formatNumberVisual(offer[h] !== null && offer[h] !== undefined && offer[h] !== '' ? offer[h] : '-', false)}</td>`;
+            }
+          }
+        });
+        html += `<td style="white-space:nowrap;vertical-align:middle;">
+          <button class="btn-supplier" onclick="switchSupplier(${idx})">Поставщик (${item.sortedOffers.length})</button>
+        </td>`;
+        html += `<td style="white-space:nowrap;vertical-align:middle;">
+          <button class="btn-toggle-plan" onclick="togglePlanRow(${idx})" id="toggle-plan-btn-${idx}">План</button>
+        </td>`;
+        tailHeaders.forEach((h, hIdx) => {
+          if (h === "Суммарное наличие") {
+            html += `<td class="align-right" data-raw="${totalStock}">${formatNumberVisual(totalStock, true)}</td>`;
+          } else {
+            // Выравниваем по правому краю, если это числовой столбец
+            const rightAlignTailHeaders = ["Цена (RUB)", "Цена (USD)", "Объем упаковки, м3", "Вес упаковки, кг"];
+            const alignClass = rightAlignTailHeaders.includes(h) ? 'align-right' : '';
+            html += `<td id="cell-${idx}-${h}" class="${alignClass}" data-raw="${offer[h] !== null && offer[h] !== undefined && offer[h] !== '' ? offer[h] : '-'}">${formatNumberVisual(offer[h] !== null && offer[h] !== undefined && offer[h] !== '' ? offer[h] : '-', false)}</td>`;
+          }
+        });
+        html += '</tr>';
+        // План закупки — отдельная строка, только если открыт
+        if (isPlanOpen[idx]) {
+          const planId = `plan-row-${idx}`;
+          let planTableRowsDP = '';
+          let planDP = [];
+          let totalPriceDP = 0;
+          let totalQtyDP = 0;
+          // --- Оптимальный план закупки (bounded knapsack) ---
+          offersForDP = item.sortedOffers.map(off => {
+            let stockRaw = off["Наличие (шт)"];
+            let parsedStock = (off["Дистр"] || '').toLowerCase() === 'treolan'
+              ? parseStockTreolan(stockRaw)
+              : parseStock(stockRaw);
+            let stockNum = Number(stockRaw);
+            let stock = Math.max(0, isNaN(stockNum) ? parsedStock : Math.min(parsedStock, stockNum));
+            let price = getOfferUsdCbr(off);
+            // Логируем попадание в DP
+            if (stock > 0 && isFinite(price)) {
+              console.log(`[DP] Включён: ${off["Дистр"]}, stock: ${stock}, price: ${price}`);
+            } else {
+                              console.log(`[DP] Пропущен: ${off["Дистр"]}, stock: ${stock}, price: ${price}`);
+            }
+            return {
+                              distributor: off["Дистр"],
+              price: price === null ? Infinity : price,
+              stock: stock,
+              offerObj: off
+            };
+          }).filter(x => x.stock > 0 && isFinite(x.price));
+          // DP: нельзя брать больше, чем stock у каждого дистрибьютора
+          let dp = Array(requiredQty + 1).fill(Infinity);
+          let from = Array(requiredQty + 1).fill(null);
+          dp[0] = 0;
+          for (let i = 0; i < offersForDP.length; ++i) {
+            for (let q = requiredQty; q >= 0; --q) {
+              for (let take = 1; take <= offersForDP[i].stock && q + take <= requiredQty; ++take) {
+                if (dp[q] < Infinity) {
+                  let newCost = dp[q] + take * offersForDP[i].price;
+                  if (newCost < dp[q + take]) {
+                    dp[q + take] = newCost;
+                    from[q + take] = {prev: q, offerIdx: i, take};
+                  }
+                }
+              }
+            }
+          }
+          // Если DP не смог набрать нужное количество, собираем максимум возможного по stock
+          planDP = [];
+          totalPriceDP = dp[requiredQty];
+          totalQtyDP = 0;
+          if (isFinite(totalPriceDP)) {
+            // Восстанавливаем план закупки
+            let used = Array(offersForDP.length).fill(0);
+            let q = requiredQty;
+            while (q > 0 && from[q]) {
+              let {prev, offerIdx, take} = from[q];
+              used[offerIdx] += take;
+              q = prev;
+            }
+            // Формируем строки для таблицы
+            for (let i = 0; i < offersForDP.length; ++i) {
+              if (used[i] > 0) {
+                let qty = Math.min(used[i], offersForDP[i].stock);
+                planDP.push({
+                  distributor: offersForDP[i].distributor,
+                  qty: qty,
+                  price: offersForDP[i].price,
+                  sum: qty * offersForDP[i].price
+                });
+                totalQtyDP += qty;
+              }
+            }
+          } else {
+            // Если не хватает товара, собираем максимум возможного
+            let qtyLeft = requiredQty;
+            for (let i = 0; i < offersForDP.length; ++i) {
+              let take = Math.min(qtyLeft, offersForDP[i].stock);
+              if (take > 0) {
+                planDP.push({
+                  distributor: offersForDP[i].distributor,
+                  qty: take,
+                  price: offersForDP[i].price,
+                  sum: take * offersForDP[i].price
+                });
+                totalQtyDP += take;
+                qtyLeft -= take;
+              }
+              if (qtyLeft <= 0) break;
+            }
+            totalPriceDP = planDP.reduce((acc, row) => acc + row.sum, 0);
+          }
+          planTableRowsDP = '';
+          if (planDP.length > 0) {
+            planDP.forEach(row => {
+              planTableRowsDP += `<tr style="color:#090;"><td>${row.distributor}</td><td class="align-right">${formatNumberVisual(row.qty, true)}</td><td class="align-right">${formatNumberVisual(Number(row.price).toFixed(2), false)}</td><td class="align-right">${formatNumberVisual(Number(row.sum).toFixed(2), false)}</td></tr>`;
+            });
+          }
+          let rowClass = (!isFinite(totalPriceDP) || totalQtyDP < requiredQty ? 'style="background:#ffeaea;"' : 'style="background:#eaffea;"');
+          html += `<tr class="procurement-plan-row"><td colspan="${headers.length + tailHeaders.length + 1}" style="font-size:0.98em;${!isFinite(totalPriceDP)?'color:#b00;':'color:#090;'}">`;
+          html += `<div id="${planId}" style="margin-top:4px;margin-bottom:2px;">`;
+          if (totalQtyDP < requiredQty) {
+            html += `<span style='color:#b00;font-weight:bold;'>Недостаточно товара! Доступно только: ${formatNumberVisual(totalQtyDP, true)} из ${formatNumberVisual(requiredQty, true)}. Не хватает: ${formatNumberVisual(requiredQty-totalQtyDP, true)}</span><br>`;
+          }
+          html += `<table style="border-collapse:collapse;font-size:0.97em;margin-bottom:2px;"><tr style="background:#f0f0f0;"><th>Дистр</th><th>Кол-во</th><th>Цена за шт (USD)</th><th>Сумма (USD)</th></tr>${planTableRowsDP}</table>`;
+          html += `Итоговая цена: <b>${planDP.length > 0 ? formatNumberVisual(totalPriceDP.toFixed(2)) : '-'} USD</b>`;
+          html += `</div></td></tr>`;
+        }
+      });
+      html += '</table></div>';
+      document.getElementById('table-container').innerHTML = html;
+      window._lastTableDataWithGaps = data;
+      let notice = document.getElementById('treolan-notice');
+      if (!notice) {
+        notice = document.createElement('div');
+        notice.id = 'treolan-notice';
+        notice.style = 'margin: 18px 0 0 0; color: #555; font-size: 1.01em; background: #f8fafc; border-left: 4px solid #4f8cff; padding: 8px 18px; max-width: 900px;';
+        document.getElementById('table-container').after(notice);
+      }
+      notice.innerHTML = '<b>Внимание:</b> <i>Наличие (шт) у дистрибьютора Treolan не является точным и конвертируется в примерное значение. Для точного уточнения советуем обратиться в компанию Treolan.</i>';
+      document.querySelectorAll('input.required-qty-input').forEach(input => {
+        input.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' && !e.ctrlKey && !e.shiftKey) {
+            e.preventDefault();
+            const idx = this.getAttribute('data-idx');
+            const val = parseInt(this.value, 10);
+            const data = window._lastTableDataWithGaps || [];
+            if (!data[idx]) return;
+            data[idx].requiredQty = isNaN(val) || val < 1 ? 1 : val;
+            renderGroupedTableWithGaps(data, window._isCheckboxesVisible);
+          }
+        });
+      });
+      if (isShortened) {
+        applyShortNameState();
+      }
+      
+
+      
+      // В конце рендера таблицы вызываем applyShortNameState
+      applyShortNameState();
+
+      } catch (error) {
+        console.error('Ошибка в renderGroupedTableWithGaps:', error);
+      }
+    }
+
+    // --- Функция для сворачивания/разворачивания плана закупки ---
+    window.togglePlanRow = function(idx) {
+      isPlanOpen[idx] = !isPlanOpen[idx];
+      
+
+      renderGroupedTableWithGaps(window._lastTableDataWithGaps || [], window._isCheckboxesVisible);
+    }
+    window.switchSupplier = function(rowIdx) {
+      const data = window._lastTableDataWithGaps || [];
+      if (!data[rowIdx] || !data[rowIdx].sortedOffers || data[rowIdx].sortedOffers.length === 0) return;
+      if (!window._currentOfferIdx) {
+        window._currentOfferIdx = [];
+      }
+      let idx = window._currentOfferIdx[rowIdx] != null ? window._currentOfferIdx[rowIdx] : 0;
+      idx = (idx + 1) % data[rowIdx].sortedOffers.length;
+      window._currentOfferIdx[rowIdx] = idx;
+      
+
+      renderGroupedTableWithGaps(data, window._isCheckboxesVisible);
+    }
+    function updateProcurementPlan(idx) {
+      const data = window._lastTableDataWithGaps || [];
+      const item = data[idx];
+      if (!item || !item.sortedOffers || item.sortedOffers.length === 0) return;
+      let requiredQty = item.requiredQty || 1;
+      let qtyLeft = requiredQty;
+      let totalPrice = 0;
+      let plan = [];
+      let planTableRows = '';
+      for (const off of item.sortedOffers) {
+        let available = parseInt(off["Наличие (шт)"]) || 0;
+        if (isNaN(available) || available <= 0) continue;
+        let take = Math.min(qtyLeft, available);
+        // Использовать getOfferUsdCbr для расчёта цены
+        let priceUsd = getOfferUsdCbr(off);
+        let priceStr = priceUsd === null ? '-' : priceUsd.toFixed(2);
+        if (take > 0) {
+          plan.push(`${off["Дистр"]}: ${take} x ${priceStr}`);
+          if (priceUsd !== null) {
+            totalPrice += take * priceUsd;
+          }
+                      planTableRows += `<tr><td>${off["Дистр"]}</td><td>${take}</td><td>${priceStr}</td><td>${priceUsd === null ? '-' : (take * priceUsd).toFixed(2)}</td></tr>`;
+          qtyLeft -= take;
+        }
+        if (qtyLeft <= 0) break;
+      }
+      // Обновить строку плана закупки и итоговой цены
+      const planRow = document.querySelector(`#row-${idx} + tr`);
+      if (planRow) {
+        planRow.innerHTML = `<td colspan="${headers.length + tailHeaders.length + 1}" style="font-size:0.98em;${qtyLeft>0?'color:#b00;':'color:#090;'}">` +
+          (qtyLeft > 0
+            ? `Недостаточно товара! Доступно только: ${formatNumberVisual(requiredQty-qtyLeft)}.`
+            : `План закупки: ${plan.join(', ')} | Итоговая цена: <b>${isNaN(totalPrice) ? '-' : totalPrice.toFixed(2)} USD</b>`) +
+          `</td>`;
+      }
+    }
+    // --- Обновление требуемого количества и пересчёт плана закупки ---
+    window.updateRequiredQty = function(btn) {
+      try {
+        const idx = btn.getAttribute('data-idx');
+        const input = document.querySelector('input.required-qty-input[data-idx="'+idx+'"]');
+        if (!input) return;
+        let val = parseInt(input.value, 10);
+        if (isNaN(val) || val < 1) val = 1;
+        const data = window._lastTableDataWithGaps || [];
+        if (!data[idx]) return;
+        data[idx].requiredQty = val;
+        
+
+        renderGroupedTableWithGaps(data, window._isCheckboxesVisible);
+      } catch (error) {
+        console.error('Ошибка в updateRequiredQty:', error);
+      }
+    }
+
+        // Удален старый диалог поиска по наименованию - теперь используется встроенный поиск
+    
+    async function performNameSearchWithSort(sortBy, sortOrder) {
+      const nameSearchInput = document.getElementById('name-search-input');
+      const tableContainer = document.getElementById('table-container');
+      
+      if (!nameSearchInput || !tableContainer) {
+        console.error('Не найдены необходимые элементы для поиска по наименованию');
+        return;
+      }
+      
+      const query = nameSearchInput.value.trim();
+      const limit = '1000000'; // Всегда показываем все товары
+      
+      // Разбиваем запрос на слова для дополнительной фильтрации
+      const query_words = query.split(' ').filter(word => word.trim());
+      
+      if (!query) {
+        tableContainer.innerHTML = '<p style="color: #e53e3e;">Введите поисковый запрос</p>';
+        return;
+      }
+      
+      // Очищаем глобальное состояние перед новым поиском
+      window._currentOfferIdx = [];
+      window._lastTableDataWithGaps = null;
+      window._isCheckboxesVisible = false;
+      
+      tableContainer.innerHTML = '<p>Поиск...</p>';
+      
+      try {
+        const url = `/search/name?query=${encodeURIComponent(query)}&sort_by=${sortBy}&sort_order=${sortOrder}&limit=${limit}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.error) {
+          tableContainer.innerHTML = `<p style="color: #e53e3e;">Ошибка: ${data.error}</p>`;
+          return;
+        }
+        
+        if (!data.results || data.results.length === 0) {
+          tableContainer.innerHTML = `<p>По запросу "${query}" ничего не найдено</p>`;
+          return;
+        }
+        
+        // Преобразуем результаты в формат для основной таблицы
+        const tableData = data.results.map(item => {
+          // Создаем офферы из информации о дистрибьюторах
+          const offers = item.distributors.map(dist => {
+            // Рассчитываем правильную USD цену с учетом ЦБ
+            const usdCbrPrice = getOfferUsdCbr({
+              "Цена (USD)": dist.price_usd,
+              "Цена (RUB)": dist.price_rub,
+              "Дистр": dist.distributor
+            });
+            
+            return {
+              "Наименование": dist.name,
+              "Бренд": dist.brand,
+              "Партномер": item.part_number,
+              "Цена (USD, ЦБ)": usdCbrPrice ? usdCbrPrice.toFixed(2) : '-',
+              "Наличие (шт)": dist.stock || '0',
+              "Дистр": dist.distributor,
+              "Треб кол": "1",
+              "Цена (RUB)": dist.price_rub ? dist.price_rub.toFixed(2) : '-',
+              "Цена (USD)": dist.price_usd ? dist.price_usd.toFixed(2) : '-',
+              "Суммарное наличие": item.total_stock || '0',
+              "Объем упаковки, м3": "-",
+              "Вес упаковки, кг": "-",
+              "Технические характеристики": "None",
+              "Дата транзита": "-"
+            };
+          });
+          
+          // Вычисляем минимальную цену USD для сортировки
+          let minUsd = Infinity;
+          offers.forEach(offer => {
+            if (offer["Цена (USD)"] !== '-' && offer["Цена (USD)"] !== '0') {
+              const price = parseFloat(offer["Цена (USD)"]);
+              if (!isNaN(price) && price > 0 && price < minUsd) {
+                minUsd = price;
+              }
+            }
+          });
+          if (minUsd === Infinity) minUsd = 0;
+          
+          // Сортируем офферы: сначала с наличием > 0, потом с наличием = 0
+          const sortedOffers = [...offers].sort((a, b) => {
+            const aDist = (a["Дистр"] || '').toLowerCase();
+            const bDist = (b["Дистр"] || '').toLowerCase();
+            const aStock = aDist === 'treolan' ? parseStockTreolan(a["Наличие (шт)"]) : parseStock(a["Наличие (шт)"]);
+            const bStock = bDist === 'treolan' ? parseStockTreolan(b["Наличие (шт)"]) : parseStock(b["Наличие (шт)"]);
+            
+            // Сначала сортируем по наличию: товары с наличием > 0 идут первыми
+            if (aStock > 0 && bStock === 0) return -1;  // A с наличием > 0, B с наличием = 0
+            if (aStock === 0 && bStock > 0) return 1;   // A с наличием = 0, B с наличием > 0
+            
+            // Если оба с наличием > 0 или оба с наличием = 0, сортируем по цене USD
+            if (aStock > 0 && bStock > 0) {
+              // Оба с наличием > 0 - сортируем по возрастанию цены
+              const aPrice = parseFloat(a["Цена (USD)"]) || 0;
+              const bPrice = parseFloat(b["Цена (USD)"]) || 0;
+              return aPrice - bPrice;
+            } else if (aStock === 0 && bStock === 0) {
+              // Оба с наличием = 0 - сортируем по возрастанию цены
+              const aPrice = parseFloat(a["Цена (USD)"]) || 0;
+              const bPrice = parseFloat(b["Цена (USD)"]) || 0;
+              return aPrice - bPrice;
+            }
+            
+            // Если один с наличием > 0, а другой с наличием = 0, то с наличием > 0 идет первым
+            return bStock - aStock;
+          });
+          
+          return {
+            part_number: item.part_number,
+            name: item.name,
+            brand: item.brand,
+            offers: offers,
+            sortedOffers: sortedOffers,
+            requiredQty: 1,
+            minUsd: minUsd,
+            total_stock: parseInt(item.total_stock) || 0
+          };
+        });
+        
+        // Дополнительная фильтрация на клиенте для большей точности
+        if (query_words.length >= 2) {
+          const filteredData = tableData.filter(item => {
+            const name = (item.name || '').toLowerCase();
+            const brand = (item.brand || '').toLowerCase();
+            const partNumber = (item.part_number || '').toLowerCase();
+            // Проверяем, что первое слово (основной товар) присутствует в названии
+            const mainWord = query_words[0].toLowerCase();
+            if (!normalizeSimilarLetters(name).includes(normalizeSimilarLetters(mainWord))) {
+              return false;
+            }
+            // Проверяем, что остальные слова присутствуют где-то в данных
+            for (let i = 1; i < query_words.length; i++) {
+              const word = query_words[i].toLowerCase();
+              if (!normalizeSimilarLetters(name).includes(normalizeSimilarLetters(word)) &&
+                  !normalizeSimilarLetters(brand).includes(normalizeSimilarLetters(word)) &&
+                  !normalizeSimilarLetters(partNumber).includes(normalizeSimilarLetters(word))) {
+                return false;
+              }
+            }
+            return true;
+          });
+          
+          // Обновляем информацию о количестве результатов
+          const actualCount = filteredData.length;
+          renderGroupedTableWithGaps(filteredData, true);
+          
+          // Показываем информацию о поиске
+          const searchInfo = document.createElement('div');
+          searchInfo.style = 'margin-bottom: 15px; padding: 8px; background: #e9ecef; border-radius: 4px; font-size: 14px;';
+          searchInfo.innerHTML = `Найдено ${actualCount} товаров по запросу "${query}" (отфильтровано из ${data.total_count}) - Сортировка: ${getSortDescription(sortBy, sortOrder)}`;
+          tableContainer.insertBefore(searchInfo, tableContainer.firstChild);
+        } else {
+          // Отображаем в основной таблице без дополнительной фильтрации
+          renderGroupedTableWithGaps(tableData, true);
+          
+          // Показываем информацию о поиске
+          const searchInfo = document.createElement('div');
+          searchInfo.style = 'margin-bottom: 15px; padding: 8px; background: #e9ecef; border-radius: 4px; font-size: 14px;';
+          searchInfo.innerHTML = `Найдено ${data.total_count} товаров по запросу "${query}" - Сортировка: ${getSortDescription(sortBy, sortOrder)}`;
+          tableContainer.insertBefore(searchInfo, tableContainer.firstChild);
+        }
+        
+      } catch (error) {
+        console.error('Ошибка поиска:', error);
+        tableContainer.innerHTML = '<p style="color: #e53e3e;">Ошибка при выполнении поиска</p>';
+      }
+    }
+
+    async function performNameSearch() {
+      const nameSearchInput = document.getElementById('name-search-input');
+      const tableContainer = document.getElementById('table-container');
+      
+      if (!nameSearchInput || !tableContainer) {
+        console.error('Не найдены необходимые элементы для поиска по наименованию');
+        return;
+      }
+      
+      const query = nameSearchInput.value.trim();
+      const limit = '1000000'; // Всегда показываем все товары
+      // Используем сортировку по умолчанию - по наличию по убыванию
+      const sortBy = "stock";
+      const sortOrder = "desc";
+      
+      // Разбиваем запрос на слова для дополнительной фильтрации
+      const query_words = query.split(' ').filter(word => word.trim());
+      
+      if (!query) {
+        tableContainer.innerHTML = '<p style="color: #e53e3e;">Введите поисковый запрос</p>';
+        return;
+      }
+      
+      // Очищаем глобальное состояние перед новым поиском
+      window._currentOfferIdx = [];
+      window._lastTableDataWithGaps = null;
+      window._isCheckboxesVisible = false;
+      
+      tableContainer.innerHTML = '<p>Поиск...</p>';
+      
+      try {
+        const url = `/search/name?query=${encodeURIComponent(query)}&sort_by=${sortBy}&sort_order=${sortOrder}&limit=${limit}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.error) {
+          tableContainer.innerHTML = `<p style="color: #e53e3e;">Ошибка: ${data.error}</p>`;
+          return;
+        }
+        
+        if (!data.results || data.results.length === 0) {
+          tableContainer.innerHTML = `<p>По запросу "${query}" ничего не найдено</p>`;
+          return;
+        }
+        
+        // Преобразуем результаты в формат для основной таблицы
+        const tableData = data.results.map(item => {
+          // Создаем офферы из информации о дистрибьюторах
+          const offers = item.distributors.map(dist => {
+            // Рассчитываем правильную USD цену с учетом ЦБ
+            const usdCbrPrice = getOfferUsdCbr({
+              "Цена (USD)": dist.price_usd,
+              "Цена (RUB)": dist.price_rub,
+              "Дистр": dist.distributor
+            });
+            
+            return {
+              "Наименование": dist.name,
+              "Бренд": dist.brand,
+              "Партномер": item.part_number,
+              "Цена (USD, ЦБ)": usdCbrPrice ? usdCbrPrice.toFixed(2) : '-',
+              "Наличие (шт)": dist.stock || '0',
+              "Дистр": dist.distributor,
+              "Треб кол": "1",
+              "Цена (RUB)": dist.price_rub ? dist.price_rub.toFixed(2) : '-',
+              "Цена (USD)": dist.price_usd ? dist.price_usd.toFixed(2) : '-',
+              "Суммарное наличие": item.total_stock || '0',
+              "Объем упаковки, м3": "-",
+              "Вес упаковки, кг": "-",
+              "Технические характеристики": "None",
+              "Дата транзита": "-"
+            };
+          });
+          
+          // Вычисляем минимальную цену USD для сортировки
+          let minUsd = Infinity;
+          offers.forEach(offer => {
+            if (offer["Цена (USD)"] !== '-' && offer["Цена (USD)"] !== '0') {
+              const price = parseFloat(offer["Цена (USD)"]);
+              if (!isNaN(price) && price > 0 && price < minUsd) {
+                minUsd = price;
+              }
+            }
+          });
+          if (minUsd === Infinity) minUsd = 0;
+          
+          // Сортируем офферы: сначала с наличием > 0, потом с наличием = 0
+          const sortedOffers = [...offers].sort((a, b) => {
+            const aDist = (a["Дистр"] || '').toLowerCase();
+            const bDist = (b["Дистр"] || '').toLowerCase();
+            const aStock = aDist === 'treolan' ? parseStockTreolan(a["Наличие (шт)"]) : parseStock(a["Наличие (шт)"]);
+            const bStock = bDist === 'treolan' ? parseStockTreolan(b["Наличие (шт)"]) : parseStock(b["Наличие (шт)"]);
+            
+            // Сначала сортируем по наличию: товары с наличием > 0 идут первыми
+            if (aStock > 0 && bStock === 0) return -1;  // A с наличием > 0, B с наличием = 0
+            if (aStock === 0 && bStock > 0) return 1;   // A с наличием = 0, B с наличием > 0
+            
+            // Если оба с наличием > 0 или оба с наличием = 0, сортируем по цене USD
+            if (aStock > 0 && bStock > 0) {
+              // Оба с наличием > 0 - сортируем по возрастанию цены
+              const aPrice = parseFloat(a["Цена (USD)"]) || 0;
+              const bPrice = parseFloat(b["Цена (USD)"]) || 0;
+              return aPrice - bPrice;
+            } else if (aStock === 0 && bStock === 0) {
+              // Оба с наличием = 0 - сортируем по возрастанию цены
+              const aPrice = parseFloat(a["Цена (USD)"]) || 0;
+              const bPrice = parseFloat(b["Цена (USD)"]) || 0;
+              return aPrice - bPrice;
+            }
+            
+            // Если один с наличием > 0, а другой с наличием = 0, то с наличием > 0 идет первым
+            return bStock - aStock;
+          });
+          
+          return {
+            part_number: item.part_number,
+            name: item.name,
+            brand: item.brand,
+            offers: offers,
+            sortedOffers: sortedOffers,
+            requiredQty: 1,
+            minUsd: minUsd,
+            total_stock: parseInt(item.total_stock) || 0
+          };
+        });
+        
+        // Дополнительная фильтрация на клиенте для большей точности
+        if (query_words.length >= 2) {
+          const filteredData = tableData.filter(item => {
+            const name = (item.name || '').toLowerCase();
+            const brand = (item.brand || '').toLowerCase();
+            const partNumber = (item.part_number || '').toLowerCase();
+            // Проверяем, что первое слово (основной товар) присутствует в названии
+            const mainWord = query_words[0].toLowerCase();
+            if (!normalizeSimilarLetters(name).includes(normalizeSimilarLetters(mainWord))) {
+              return false;
+            }
+            // Проверяем, что остальные слова присутствуют где-то в данных
+            for (let i = 1; i < query_words.length; i++) {
+              const word = query_words[i].toLowerCase();
+              if (!normalizeSimilarLetters(name).includes(normalizeSimilarLetters(word)) &&
+                  !normalizeSimilarLetters(brand).includes(normalizeSimilarLetters(word)) &&
+                  !normalizeSimilarLetters(partNumber).includes(normalizeSimilarLetters(word))) {
+                return false;
+              }
+            }
+            return true;
+          });
+          
+          // Обновляем информацию о количестве результатов
+          const actualCount = filteredData.length;
+          renderGroupedTableWithGaps(filteredData, true);
+          
+          // Показываем информацию о поиске
+          const searchInfo = document.createElement('div');
+          searchInfo.style = 'margin-bottom: 15px; padding: 8px; background: #e9ecef; border-radius: 4px; font-size: 14px;';
+          searchInfo.innerHTML = `Найдено ${actualCount} товаров по запросу "${query}" (отфильтровано из ${data.total_count})`;
+          tableContainer.insertBefore(searchInfo, tableContainer.firstChild);
+        } else {
+          // Отображаем в основной таблице без дополнительной фильтрации
+          renderGroupedTableWithGaps(tableData, true);
+          
+          // Показываем информацию о поиске
+          const searchInfo = document.createElement('div');
+          searchInfo.style = 'margin-bottom: 15px; padding: 8px; background: #e9ecef; border-radius: 4px; font-size: 14px;';
+          searchInfo.innerHTML = `Найдено ${data.total_count} товаров по запросу "${query}"`;
+          tableContainer.insertBefore(searchInfo, tableContainer.firstChild);
+        }
+        
+      } catch (error) {
+        console.error('Ошибка поиска:', error);
+        tableContainer.innerHTML = '<p style="color: #e53e3e;">Ошибка при выполнении поиска</p>';
+      }
+    }
+    
+    function getSortDescription(sortBy, sortOrder) {
+      const sortNames = {
+        'price_rub': 'Цена (RUB)',
+        'price_usd': 'Цена (USD)',
+        'stock': 'Наличие',
+        'name': 'Название'
+      };
+      
+      const orderNames = {
+        'asc': 'по возрастанию',
+        'desc': 'по убыванию'
+      };
+      
+      return `${sortNames[sortBy] || sortBy} ${orderNames[sortOrder] || sortOrder}`;
+    }
+
+    function addToSearch(partNumber) {
+      // Добавляем партномер в основное поле поиска
+      const partNumbersTextarea = document.getElementById('part_numbers');
+      if (!partNumbersTextarea) {
+        console.error('Не найдено поле для партномеров');
+        return;
+      }
+      
+      const currentValue = partNumbersTextarea.value.trim();
+      
+      if (currentValue) {
+        // Если уже есть партномера, добавляем с новой строки
+        partNumbersTextarea.value = currentValue + '\n' + partNumber;
+      } else {
+        // Если поле пустое, просто добавляем партномер
+        partNumbersTextarea.value = partNumber;
+      }
+      
+      // Показываем уведомление
+      const notification = document.createElement('div');
+      notification.style = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #10b981;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        z-index: 1001;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      `;
+      notification.textContent = `Партномер ${partNumber} добавлен в поиск`;
+      document.body.appendChild(notification);
+      
+      // Удаляем уведомление через 3 секунды
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.remove();
+        }
+      }, 3000);
+    }
+
+    // Функция сортировки таблицы по клику на заголовок
+    window.sortTableByColumn = function(columnName, direction) {
+      
+      const data = window._lastTableDataWithGaps || [];
+      if (!data || data.length === 0) return;
+      
+      let isAscending;
+      if (direction === 'asc') isAscending = true;
+      else if (direction === 'desc') isAscending = false;
+      else {
+        const currentSort = window._currentSort || {};
+        isAscending = currentSort.column === columnName ? !currentSort.ascending : true;
+      }
+      
+      // Добавляем небольшую задержку для предотвращения случайных двойных кликов
+      if (window._sortTimeout) {
+        clearTimeout(window._sortTimeout);
+      }
+      
+      window._sortTimeout = setTimeout(() => {
+        performSort(data, columnName, isAscending);
+      }, 100);
+    }
+
+    // Вынесенная логика сортировки
+    function performSort(data, columnName, isAscending) {
+      data.sort((a, b) => {
+        if (a._empty || a._notfound) return 1;
+        if (b._empty || b._notfound) return -1;
+        
+        let aVal, bVal;
+        
+        // ... existing code ...
+        if (columnName === "Наименование") {
+          aVal = a.name || "";
+          bVal = b.name || "";
+        } else if (columnName === "Бренд") {
+          aVal = a.brand || "";
+          bVal = b.brand || "";
+        } else if (columnName === "Партномер") {
+          aVal = a.part_number || "";
+          bVal = b.part_number || "";
+        } else if (columnName === "Цена (USD, ЦБ)") {
+          // Получаем значение USD/ЦБ для сортировки
+          function getUsdCbrValue(item) {
+            if (!item.sortedOffers || item.sortedOffers.length === 0) return 0;
+            const offer = item.sortedOffers[0];
+            let usd = offer["Цена (USD)"];
+            let rub = offer["Цена (RUB)"];
+            let val = 0;
+            if (usd !== undefined && usd !== null && usd !== '' && usd !== '-') {
+              val = parseFloat(usd) || 0;
+            } else if (rub !== undefined && rub !== null && rub !== '' && rub !== '-' && window._lastCbrRate && window._lastCbrRate.rate) {
+              let numRub = parseFloat(rub);
+              if (!isNaN(numRub) && numRub > 0) {
+                val = numRub / window._lastCbrRate.rate;
+              }
+            }
+            return val;
+          }
+          aVal = getUsdCbrValue(a);
+          bVal = getUsdCbrValue(b);
+        } else if (columnName === "Цена (RUB)") {
+          aVal = a.sortedOffers && a.sortedOffers.length > 0 ? parseFloat(a.sortedOffers[0]["Цена (RUB)"]) || 0 : 0;
+          bVal = b.sortedOffers && b.sortedOffers.length > 0 ? parseFloat(b.sortedOffers[0]["Цена (RUB)"]) || 0 : 0;
+        } else if (columnName === "Цена (USD)") {
+          aVal = a.sortedOffers && a.sortedOffers.length > 0 ? parseFloat(a.sortedOffers[0]["Цена (USD)"]) || 0 : 0;
+          bVal = b.sortedOffers && b.sortedOffers.length > 0 ? parseFloat(b.sortedOffers[0]["Цена (USD)"]) || 0 : 0;
+        } else if (columnName === "Наличие (шт)") {
+          aVal = a.sortedOffers && a.sortedOffers.length > 0 ? parseFloat(a.sortedOffers[0]["Наличие (шт)"]) || 0 : 0;
+          bVal = b.sortedOffers && b.sortedOffers.length > 0 ? parseFloat(b.sortedOffers[0]["Наличие (шт)"]) || 0 : 0;
+        } else if (columnName === "Суммарное наличие") {
+          aVal = a.sortedOffers && a.sortedOffers.length > 0 ? parseFloat(a.sortedOffers[0]["Суммарное наличие"]) || 0 : 0;
+          bVal = b.sortedOffers && b.sortedOffers.length > 0 ? parseFloat(b.sortedOffers[0]["Суммарное наличие"]) || 0 : 0;
+        } else if (columnName === "Объем упаковки, м3") {
+          aVal = a.sortedOffers && a.sortedOffers.length > 0 ? parseFloat(a.sortedOffers[0]["Объем упаковки, м3"]) || 0 : 0;
+          bVal = b.sortedOffers && b.sortedOffers.length > 0 ? parseFloat(b.sortedOffers[0]["Объем упаковки, м3"]) || 0 : 0;
+        } else if (columnName === "Вес упаковки, кг") {
+          aVal = a.sortedOffers && a.sortedOffers.length > 0 ? parseFloat(a.sortedOffers[0]["Вес упаковки, кг"]) || 0 : 0;
+          bVal = b.sortedOffers && b.sortedOffers.length > 0 ? parseFloat(b.sortedOffers[0]["Вес упаковки, кг"]) || 0 : 0;
+        } else if (columnName === "Технические характеристики") {
+          aVal = a.sortedOffers && a.sortedOffers.length > 0 ? a.sortedOffers[0]["Технические характеристики"] || "" : "";
+          bVal = b.sortedOffers && b.sortedOffers.length > 0 ? b.sortedOffers[0]["Технические характеристики"] || "" : "";
+        } else if (columnName === "Дата транзита") {
+          aVal = a.sortedOffers && a.sortedOffers.length > 0 ? a.sortedOffers[0]["Дата транзита"] || "" : "";
+          bVal = b.sortedOffers && b.sortedOffers.length > 0 ? b.sortedOffers[0]["Дата транзита"] || "" : "";
+        } else {
+          console.log(`Сортировка по столбцу "${columnName}" не поддерживается`);
+          return 0;
+        }
+        
+        if (typeof aVal === 'string' && typeof bVal === 'string') {
+          return isAscending ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+        } else {
+          return isAscending ? aVal - bVal : bVal - aVal;
+        }
+      });
+      
+      window._currentSort = { column: columnName, ascending: isAscending };
+      
+
+      renderGroupedTableWithGaps(data, window._isCheckboxesVisible);
+      
+      // Обновляем стили заголовков
+      const headers = document.querySelectorAll('th');
+      headers.forEach(header => {
+        header.style.background = '#f0f4fa';
+        if (header.textContent.includes(columnName)) {
+          header.style.background = isAscending ? '#e0e7ff' : '#dbeafe';
+          header.title = `Сортировка: ${columnName} (${isAscending ? 'по возрастанию' : 'по убыванию'})`;
+        }
+      });
+    }
+
+    window.togglePartInSearch = function(checkbox) {
+      const partNumber = checkbox.getAttribute('data-part');
+      const textarea = document.getElementById('part_numbers');
+      if (!textarea) return;
+      let lines = textarea.value.split('\n').map(x => x.trim()).filter(x => x);
+      if (checkbox.checked) {
+        if (!lines.includes(partNumber)) lines.push(partNumber);
+      } else {
+        lines = lines.filter(x => x !== partNumber);
+      }
+      textarea.value = lines.join('\n');
+    };
+
+
+    
+
+
+
+    
+
+
+    // --- Функция для нормализации похожих букв (A=А, K=К, O=О, E=Е, C=С, H=Н, B=В, Р=P, T=Т, Х=X, М=M) ---
+    function normalizeSimilarLetters(str) {
+      if (!str) return '';
+      return str
+        .replace(/A/g, 'А').replace(/a/g, 'а')
+        .replace(/K/g, 'К').replace(/k/g, 'к')
+        .replace(/O/g, 'О').replace(/o/g, 'о')
+        .replace(/E/g, 'Е').replace(/e/g, 'е')
+        .replace(/C/g, 'С').replace(/c/g, 'с')
+        .replace(/H/g, 'Н').replace(/h/g, 'н')
+        .replace(/B/g, 'В').replace(/b/g, 'в')
+        .replace(/P/g, 'Р').replace(/p/g, 'р')
+        .replace(/T/g, 'Т').replace(/t/g, 'т')
+        .replace(/X/g, 'Х').replace(/x/g, 'х')
+        .replace(/M/g, 'М').replace(/m/g, 'м');
+    }
+
+  </script>
+</body>
+</html>

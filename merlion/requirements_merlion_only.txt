@@ -1,0 +1,9 @@
+zeep
+pandas
+openpyxl
+tqdm
+requests
+python-dotenv
+lxml
+sqlalchemy
+asyncpg 

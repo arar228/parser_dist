@@ -50,7 +50,7 @@ os.environ['PGQUIET'] = '1'
 os.environ['ASYNC_PG_QUIET_PARAMS'] = '1'
 
 # Конфигурация
-API_KEY = "GtBN6lLQW#FgokV_W*fHWOhnDhuVRo"  # API ключ OCS
+API_KEY = "YOUR_OCS_API_KEY"  # API ключ OCS
 WORK_URL = "https://connector.b2b.ocs.ru/api/v2"
 LAST_UPDATE_FILE = "static/last_update_ocs_sale.txt"
 

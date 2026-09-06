@@ -19,8 +19,10 @@ os.environ['no_proxy'] = '*'
 os.environ['NO_PROXY'] = '*'
 
 # Конфигурация Telegram бота
-TELEGRAM_BOT_TOKEN = "8067594536:AAHNDCqVdMzYZuLUjdRCeyZj2Ju4dzTWXUk"
-TELEGRAM_CHAT_ID = "-1002258896791"
+from core.runtime_config import required_env
+
+TELEGRAM_BOT_TOKEN = required_env("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = required_env("TELEGRAM_CHAT_ID")
 TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
 
 # Глобальный словарь для отслеживания уже отправленных уведомлений
@@ -79,11 +81,11 @@ def send_telegram_message(message: str, chat_id: Optional[str] = None) -> bool:
             logging.info(f"[Telegram] Сообщение отправлено успешно")
             return True
         else:
-            logging.error(f"[Telegram] Ошибка отправки: {response.status_code} - {response.text}")
+            logging.error("Telegram request failed (HTTP %s)", response.status_code)
             return False
             
     except Exception as e:
-        logging.error(f"[Telegram] Ошибка отправки сообщения: {e}")
+        logging.error("Telegram request failed (%s)", type(e).__name__)
         return False
 
 async def notify_export_start(distributor: str) -> None:

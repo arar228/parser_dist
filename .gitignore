@@ -1,5 +1,14 @@
 # Учетные записи, ключи и сектерты
 .env
+.env.*
+!.env.example
+mysql_config.py
+*.pem
+*.key
+*.p12
+*.pfx
+*.session
+*.session-journal
 
 # Логи
 logs/

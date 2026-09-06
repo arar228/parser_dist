@@ -19,19 +19,9 @@ os.environ['SQLALCHEMY_WARN_20'] = 'false'
 os.environ['SQLALCHEMY_SILENCE_UBER_WARNING'] = '1'
 
 # Импортируем MySQL конфигурацию
-try:
-    from mysql_config import MYSQL_URL
-    DATABASE_URL = MYSQL_URL
-    print("Используется MySQL конфигурация")
-except ImportError:
-    # Fallback на PostgreSQL если MySQL конфиг не найден
-    DB_USER = "mysite_user"
-    DB_PASS = "12345"
-    DB_HOST = "localhost"
-    DB_PORT = "5432"
-    DB_NAME = "myproject"
-    DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    print("⚠️ Используется PostgreSQL конфигурация (fallback)")
+from core.runtime_config import get_database_url
+
+DATABASE_URL = get_database_url()
 
 # Создаем engine с полностью отключенным логированием
 engine = create_async_engine(
